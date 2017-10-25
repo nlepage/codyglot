@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+package com.github.zenika.codyglot.executor;
+option go_package = "executor";
+
+service Executor {
+  rpc execute(ExecuteRequest) returns (ExecuteResponse) {}
+}
+
+message ExecuteRequest {
+  string code = 1; // Code to execute
+  bytes stdIn = 2; // Content sent on the standard input
+}
+
+message ExecuteResponse {
+  uint32 exitCode = 1; // Exit code of the program
+  bytes stdOut = 2; // Content received on the standard output
+  bytes stdErr = 3; // Content received on the standard error output
+}
