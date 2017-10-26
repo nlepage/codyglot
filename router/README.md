@@ -1,2 +1,2 @@
 ### CLI Options
- * -port <port_number> Listening port, default 8080
+ * -p, --port <port_number> Listening port, default 8080

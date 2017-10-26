@@ -2,12 +2,12 @@ package main
 
 import (
 	"context"
-	"flag"
 	"fmt"
 	"log"
 	"net"
 
-	"github.com/Zenika/codyglot/router/service"
+	router "github.com/Zenika/codyglot/router/service"
+	"github.com/spf13/cobra"
 
 	"google.golang.org/grpc"
 )
@@ -21,28 +21,36 @@ var (
 )
 
 func init() {
-	flag.IntVar(&port, "port", defaultPort, "Listening port, default 8080")
+	cmd.PersistentFlags().IntVarP(&port, "port", "p", defaultPort, "Listening port, default 8080")
 }
 
 func main() {
-	flag.Parse()
-
-	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", port))
-	if err != nil {
-		log.Fatalf("Failed to listen: %v", err)
+	if err := cmd.Execute(); err != nil {
+		log.Fatal(err)
 	}
+}
 
-	s := grpc.NewServer()
-	service.RegisterRouterServer(s, &server{})
-	if err := s.Serve(lis); err != nil {
-		log.Fatalf("Failed to serve: %v", err)
-	}
+var cmd = &cobra.Command{
+	Use: "router",
+	RunE: func(cmd *cobra.Command, args []string) error {
+		lis, err := net.Listen("tcp", fmt.Sprintf(":%d", port))
+		if err != nil {
+			return fmt.Errorf("Failed to listen: %v", err)
+		}
+
+		s := grpc.NewServer()
+		router.RegisterRouterServer(s, &server{})
+		if err := s.Serve(lis); err != nil {
+			return fmt.Errorf("Failed to serve: %v", err)
+		}
+		return nil
+	},
 }
 
 type server struct{}
 
-func (*server) Execute(ctx context.Context, req *service.ExecuteRequest) (*service.ExecuteResponse, error) {
+func (*server) Execute(ctx context.Context, req *router.ExecuteRequest) (*router.ExecuteResponse, error) {
 	return nil, nil
 }
 
-var _ service.RouterServer = (*server)(nil)
+var _ router.RouterServer = (*server)(nil)
