@@ -5,6 +5,7 @@ option go_package = "service";
 
 service Router {
   rpc execute(ExecuteRequest) returns (ExecuteResponse) {}
+  rpc languages(LanguagesRequest) returns (LanguagesResponse) {}
 }
 
 message ExecuteRequest {
@@ -17,4 +18,11 @@ message ExecuteResponse {
   uint32 exitCode = 1; // Exit code of the program
   bytes stdOut = 2; // Content received on the standard output
   bytes stdErr = 3; // Content received on the standard error output
+}
+
+message LanguagesRequest {
+}
+
+message LanguagesResponse {
+  repeated string languages = 1;
 }
