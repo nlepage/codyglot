@@ -1,4 +1,2 @@
-### Compile
-```sh
-protoc -I . router.proto --go_out=plugins=grpc:.
-```
+### CLI Options
+ * -port <port_number> Listening port, default 8080

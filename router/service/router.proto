@@ -1,7 +1,7 @@
 syntax = "proto3";
 
-package com.github.zenika.codyglot.router;
-option go_package = "router";
+package com.github.zenika.codyglot.router.service;
+option go_package = "service";
 
 service Router {
   rpc execute(ExecuteRequest) returns (ExecuteResponse) {}

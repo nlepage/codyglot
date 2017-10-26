@@ -3,5 +3,5 @@ See [gRPC setup](../docs/grpc-setup.md)
 
 ### Build
 ```sh
-protoc -I . executor.proto --go_out=plugins=grpc:.
+protoc -I . router.proto --go_out=plugins=grpc:.
 ```
