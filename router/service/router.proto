@@ -3,9 +3,20 @@ syntax = "proto3";
 package com.github.zenika.codyglot.router.service;
 option go_package = "service";
 
+import "google/api/annotations.proto";
+
 service Router {
-  rpc execute(ExecuteRequest) returns (ExecuteResponse) {}
-  rpc languages(LanguagesRequest) returns (LanguagesResponse) {}
+  rpc execute(ExecuteRequest) returns (ExecuteResponse) {
+    option (google.api.http) = {
+      post: "/execute"
+      body: "*"
+    };
+  }
+  rpc languages(LanguagesRequest) returns (LanguagesResponse) {
+    option (google.api.http) = {
+      get: "/languages"
+    };
+  }
 }
 
 message ExecuteRequest {
@@ -24,5 +35,5 @@ message LanguagesRequest {
 }
 
 message LanguagesResponse {
-  repeated string languages = 1;
+  repeated string languages = 1; // Available languages
 }
