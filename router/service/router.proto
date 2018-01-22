@@ -22,13 +22,13 @@ service Router {
 message ExecuteRequest {
   string language = 1; // Language of the code to execute
   string code = 2; // Code to execute
-  bytes stdIn = 3; // Content sent on the standard input
+  string stdIn = 3; // Content sent on the standard input
 }
 
 message ExecuteResponse {
   uint32 exitCode = 1; // Exit code of the program
-  bytes stdOut = 2; // Content received on the standard output
-  bytes stdErr = 3; // Content received on the standard error output
+  string stdOut = 2; // Content received on the standard output
+  string stdErr = 3; // Content received on the standard error output
 }
 
 message LanguagesRequest {

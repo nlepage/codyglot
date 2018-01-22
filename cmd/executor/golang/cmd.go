@@ -2,6 +2,7 @@ package golang
 
 import (
 	"github.com/Zenika/codyglot/cmd/executor"
+	"github.com/Zenika/codyglot/executor/golang"
 	"github.com/spf13/cobra"
 )
 
@@ -17,7 +18,11 @@ var cmd = &cobra.Command{
 	Use:   "golang",
 	Short: "Start Codyglot golang executor",
 	RunE: func(cmd *cobra.Command, args []string) error {
-		return nil
+		e := &golang.Executor{
+			Port: port,
+		}
+
+		return e.Serve()
 	},
 }
 
