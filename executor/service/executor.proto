@@ -1,7 +1,7 @@
 syntax = "proto3";
 
-package com.github.zenika.codyglot.executor;
-option go_package = "executor";
+package com.github.zenika.codyglot.executor.service;
+option go_package = "service";
 
 service Executor {
   rpc execute(ExecuteRequest) returns (ExecuteResponse) {}
