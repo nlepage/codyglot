@@ -1,4 +1,4 @@
-package routergateway
+package gateway
 
 import (
 	"github.com/Zenika/codyglot/cmd/router"
