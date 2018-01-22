@@ -1,1 +1,5 @@
-vendor/
+/vendor/
+/codyglot
+*.pb.go
+*.pb.gw.go
+*.swagger.json
