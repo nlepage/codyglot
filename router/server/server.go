@@ -41,7 +41,7 @@ func (s *Server) Execute(ctx context.Context, req *router.ExecuteRequest) (*rout
 	}
 
 	opts := []grpc.DialOption{grpc.WithInsecure()}
-	conn, err := grpc.DialContext(ctx, target, opts...)
+	conn, err := grpc.Dial(target, opts...)
 	if err != nil {
 		return nil, errors.Wrap(err, "Router: could not create executor dial context")
 	}
