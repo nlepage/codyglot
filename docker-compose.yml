@@ -1,0 +1,24 @@
+version: "3"
+
+services:
+
+  gateway:
+    build: .
+    image: zenika/codyglot
+    command: ["router", "gateway", "-e", "router:9090"]
+    ports:
+      - "8080"
+
+  router:
+    build: .
+    image: zenika/codyglot
+    command: ["router", "server", "-l", "golang:golang:9090"]
+    expose:
+      - "9090"
+
+  golang:
+    build: .
+    image: zenika/codyglot
+    command: ["executor", "golang"]
+    expose:
+      - "9090"

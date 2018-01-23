@@ -1,0 +1,9 @@
+/.git/
+/docs/
+/vendor/
+/.dockerignore
+/.gitignore
+/Dockerfile
+/README.md
+/codyglot
+/docker-compose.yml
