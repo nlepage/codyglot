@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/Zenika/codyglot/cmd/router"
-	"github.com/Zenika/codyglot/router/server"
+	"github.com/nlepage/codyglot/cmd/router"
+	"github.com/nlepage/codyglot/router/server"
 	"github.com/spf13/cobra"
 )
 

@@ -12,7 +12,7 @@ import (
 	"path"
 	"syscall"
 
-	executor "github.com/Zenika/codyglot/executor/service"
+	executor "github.com/nlepage/codyglot/executor/service"
 	"github.com/pkg/errors"
 	"google.golang.org/grpc"
 )

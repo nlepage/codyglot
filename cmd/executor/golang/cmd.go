@@ -1,8 +1,8 @@
 package golang
 
 import (
-	"github.com/Zenika/codyglot/cmd/executor"
-	"github.com/Zenika/codyglot/executor/golang"
+	"github.com/nlepage/codyglot/cmd/executor"
+	"github.com/nlepage/codyglot/executor/golang"
 	"github.com/spf13/cobra"
 )
 

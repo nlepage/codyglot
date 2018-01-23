@@ -1,8 +1,8 @@
 package gateway
 
 import (
-	"github.com/Zenika/codyglot/cmd/router"
-	"github.com/Zenika/codyglot/router/gateway"
+	"github.com/nlepage/codyglot/cmd/router"
+	"github.com/nlepage/codyglot/router/gateway"
 	"github.com/spf13/cobra"
 )
 

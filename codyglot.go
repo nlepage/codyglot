@@ -3,7 +3,7 @@ package main
 import (
 	"log"
 
-	"github.com/Zenika/codyglot/cmd"
+	"github.com/nlepage/codyglot/cmd"
 )
 
 func main() {

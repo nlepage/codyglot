@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package com.github.zenika.codyglot.router.service;
+package com.github.nlepage.codyglot.router.service;
 option go_package = "service";
 
 import "google/api/annotations.proto";

@@ -1,7 +1,7 @@
 package router
 
 import (
-	"github.com/Zenika/codyglot/cmd/codyglot"
+	"github.com/nlepage/codyglot/cmd/codyglot"
 	"github.com/spf13/cobra"
 )
 

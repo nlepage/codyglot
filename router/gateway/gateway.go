@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"net/http"
 
-	router "github.com/Zenika/codyglot/router/service"
+	router "github.com/nlepage/codyglot/router/service"
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"google.golang.org/grpc"
 )
