@@ -4,6 +4,7 @@
 /.dockerignore
 /.gitignore
 /Dockerfile
+/LICENSE
 /README.md
 /codyglot
 /docker-compose.yml
