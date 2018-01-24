@@ -18,11 +18,7 @@ var cmd = &cobra.Command{
 	Use:   "golang",
 	Short: "Start Codyglot golang executor",
 	RunE: func(cmd *cobra.Command, args []string) error {
-		e := &golang.Executor{
-			Port: port,
-		}
-
-		return e.Serve()
+		return golang.Executor().Serve(port)
 	},
 }
 
