@@ -1,6 +1,4 @@
-# <img src="https://raw.githubusercontent.com/nlepage/codyglot/master/docs/codyglot.jpg" width="300" alt="Codyglot">
+![Codyglot](https://raw.githubusercontent.com/nlepage/codyglot/master/docs/codyglot_300.jpg)
+===
 
-
-
-### Usage
-Run `codyglot` to see usage.
+:construction: Coming soon...
