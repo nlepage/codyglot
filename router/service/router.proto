@@ -21,14 +21,16 @@ service Router {
 
 message ExecuteRequest {
   string language = 1; // Language of the code to execute
-  string code = 2; // Code to execute
-  string stdIn = 3; // Content sent on the standard input
+  string source = 2; // Source code to execute
+  string stdin = 3; // Content sent on the standard input
 }
 
 message ExecuteResponse {
-  uint32 exitCode = 1; // Exit code of the program
-  string stdOut = 2; // Content received on the standard output
-  string stdErr = 3; // Content received on the standard error output
+  uint32 exitStatus = 1; // Exit status of the program
+  string stdout = 2; // Content received on the standard output
+  string stderr = 3; // Content received on the standard error output
+  uint32 compilationTime = 4; // Compilation time
+  uint32 runningTime = 5; // Running time
 }
 
 message LanguagesRequest {

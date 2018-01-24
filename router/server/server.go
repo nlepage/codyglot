@@ -50,17 +50,17 @@ func (s *Server) Execute(ctx context.Context, req *router.ExecuteRequest) (*rout
 	client := executor.NewExecutorClient(conn)
 
 	res, err := client.Execute(ctx, &executor.ExecuteRequest{
-		Code:  req.Code,
-		StdIn: req.StdIn,
+		Source: req.Source,
+		Stdin:  req.Stdin,
 	})
 	if err != nil {
 		return nil, errors.Wrap(err, "Router: an error occured while executing request to executor")
 	}
 
 	return &router.ExecuteResponse{
-		ExitCode: res.ExitCode,
-		StdErr:   res.StdErr,
-		StdOut:   res.StdOut,
+		ExitStatus: res.ExitStatus,
+		Stderr:     res.Stderr,
+		Stdout:     res.Stdout,
 	}, nil
 }
 

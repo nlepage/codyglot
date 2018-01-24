@@ -1,17 +1,14 @@
 package golang
 
 import (
-	"bytes"
 	"context"
 	"fmt"
-	"io"
 	"io/ioutil"
 	"net"
 	"os"
-	"os/exec"
 	"path"
-	"syscall"
 
+	"github.com/nlepage/codyglot/executor/executil"
 	executor "github.com/nlepage/codyglot/executor/service"
 	"github.com/pkg/errors"
 	"google.golang.org/grpc"
@@ -40,53 +37,21 @@ func (e *Executor) Serve() error {
 
 // Execute executes Go(lang) code
 func (e *Executor) Execute(ctx context.Context, req *executor.ExecuteRequest) (*executor.ExecuteResponse, error) {
-	p, err := writeSourceFile(req.Code)
+	p, err := writeSourceFile(req.Source)
 	if err != nil {
 		return nil, err
 	}
 
-	cmd, stdin, stdout, stderr, err := command(ctx, "go", "run", p)
-	if err != nil {
-		return nil, err
-	}
+	cmd := executil.Command(ctx, "go", "run", p).WithStdin(req.Stdin)
 
-	go func() {
-		defer stdin.Close()              // TODO Manage error ?
-		io.WriteString(stdin, req.StdIn) // TODO Manage error ?
-	}()
-
-	var stdoutBuf, stderrBuf bytes.Buffer
-
-	go func() {
-		io.Copy(&stdoutBuf, stdout) // TODO Manage error ?
-	}()
-
-	go func() {
-		io.Copy(&stderrBuf, stderr) // TODO Manage error ?
-	}()
-
-	err = cmd.Start()
-	if err != nil {
-		return nil, errors.Wrap(err, "Executor: Could not start command")
-	}
-
-	var exitCode syscall.WaitStatus
-	err = cmd.Wait()
-	if err != nil {
-		exitErr, ok := err.(*exec.ExitError)
-		if !ok {
-			return nil, errors.Wrap(err, "Executor: Something went wrong during command execution")
-		}
-		exitCode = 255
-		if status, ok := exitErr.Sys().(syscall.WaitStatus); ok {
-			exitCode = status
-		}
+	if err = cmd.Run(); err != nil {
+		return nil, errors.Wrap(err, "Executor: Failed to run command")
 	}
 
 	return &executor.ExecuteResponse{
-		ExitCode: uint32(exitCode),
-		StdOut:   string(stdoutBuf.Bytes()),
-		StdErr:   string(stderrBuf.Bytes()),
+		ExitStatus: cmd.ExitStatus(),
+		Stdout:     cmd.Stdout(),
+		Stderr:     cmd.Stderr(),
 	}, nil
 }
 
@@ -112,25 +77,4 @@ func writeSourceFile(code string) (string, error) {
 	}
 
 	return p, nil
-}
-
-func command(ctx context.Context, name string, args ...string) (*exec.Cmd, io.WriteCloser, io.ReadCloser, io.ReadCloser, error) {
-	cmd := exec.Command(name, args...)
-
-	stdin, err := cmd.StdinPipe()
-	if err != nil {
-		return nil, nil, nil, nil, errors.Wrap(err, "Executor: Failed to retrieve command stdin")
-	}
-
-	stdout, err := cmd.StdoutPipe()
-	if err != nil {
-		return nil, nil, nil, nil, errors.Wrap(err, "Executor: Failed to retrieve command stdout")
-	}
-
-	stderr, err := cmd.StderrPipe()
-	if err != nil {
-		return nil, nil, nil, nil, errors.Wrap(err, "Executor: Failed to retrieve command stderr")
-	}
-
-	return cmd, stdin, stdout, stderr, nil
 }
