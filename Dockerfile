@@ -28,4 +28,4 @@ FROM alpine:3.6
 
 COPY --from=builder /go/bin/codyglot .
 
-ENTRYPOINT ["./codyglot"]
+ENTRYPOINT ["codyglot"]
