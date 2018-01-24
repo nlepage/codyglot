@@ -1,4 +1,4 @@
-FROM nlepage/codyglot:alpine as origin
+FROM nlepage/codyglot:base as origin
 
 FROM golang:1.9-alpine
 
