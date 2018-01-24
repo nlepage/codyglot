@@ -26,6 +26,6 @@ RUN protoc -I. \
 
 FROM alpine:3.6
 
-COPY --from=builder /go/bin/codyglot .
+COPY --from=builder /go/bin/codyglot /usr/local/bin
 
 ENTRYPOINT ["codyglot"]
