@@ -7,7 +7,7 @@ import (
 	"path"
 
 	"github.com/nlepage/codyglot/executor"
-	"github.com/nlepage/codyglot/executor/executil"
+	"github.com/nlepage/codyglot/executor/internal/executil"
 	"github.com/nlepage/codyglot/executor/service"
 	"github.com/pkg/errors"
 )
