@@ -5,8 +5,8 @@ For detailed installation steps see [gRPC Go quickstart](https://grpc.io/docs/qu
 go get -u google.golang.org/grpc
 ```
 
-### Download and install `protoc`
-Fetch binary from [protobuf releases](https://github.com/google/protobuf/releases) and install
+### Download and install protobuf
+Fetch binary from [protobuf releases](https://github.com/google/protobuf/releases) and install or use package manager of your distribution (depending on the distribution protobuf-dev package may be necessary).
 
 ### Install protoc plugins
 ```sh
