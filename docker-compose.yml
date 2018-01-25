@@ -4,22 +4,30 @@ services:
 
   gateway:
     image: nlepage/codyglot:base
+    read_only: true
     command: ["router", "gateway", "-e", "router:9090"]
     ports:
       - "8080"
 
   router:
     image: nlepage/codyglot:base
+    read_only: true
     command: ["router", "server", "-l", "golang:golang:9090", "-l", "nodejs:nodejs:9090"]
     expose:
       - "9090"
 
   golang:
     image: nlepage/codyglot:golang
+    read_only: true
+    tmpfs:
+      - /tmp
     expose:
       - "9090"
 
   nodejs:
     image: nlepage/codyglot:nodejs
+    read_only: true
+    tmpfs:
+      - /tmp
     expose:
       - "9090"
