@@ -2,12 +2,10 @@ package golang
 
 import (
 	"context"
-	"io/ioutil"
-	"os"
-	"path"
 
 	"github.com/nlepage/codyglot/executor"
 	"github.com/nlepage/codyglot/executor/internal/executil"
+	"github.com/nlepage/codyglot/executor/internal/srcutil"
 	"github.com/nlepage/codyglot/executor/service"
 	"github.com/pkg/errors"
 )
@@ -19,7 +17,7 @@ func Executor() executor.Executor {
 
 // Execute executes Go(lang) code
 func execute(ctx context.Context, req *service.ExecuteRequest) (*service.ExecuteResponse, error) {
-	p, err := writeSourceFile(req.Source)
+	p, err := srcutil.WriteSourceFile("main.go", req.Source)
 	if err != nil {
 		return nil, err
 	}
@@ -35,26 +33,4 @@ func execute(ctx context.Context, req *service.ExecuteRequest) (*service.Execute
 		Stdout:     cmd.Stdout(),
 		Stderr:     cmd.Stderr(),
 	}, nil
-}
-
-func writeSourceFile(code string) (string, error) {
-	dir, err := ioutil.TempDir("", "codyglot")
-	if err != nil {
-		return "", errors.Wrap(err, "Executor: Failed to create temp dir")
-	}
-
-	p := path.Join(dir, "main.go")
-
-	f, err := os.Create(p)
-	if err != nil {
-		return "", errors.Wrap(err, "Executor: Failed to create source file")
-	}
-	defer f.Close()
-
-	_, err = f.WriteString(code)
-	if err != nil {
-		return "", errors.Wrap(err, "Executor: Failed to write source file")
-	}
-
-	return p, nil
 }
