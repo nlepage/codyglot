@@ -16,6 +16,6 @@ message ExecuteResponse {
   uint32 exitStatus = 1; // Exit status of the program
   string stdout = 2; // Content received on the standard output
   string stderr = 3; // Content received on the standard error output
-  uint32 compilationTime = 4; // Compilation time
-  uint32 runningTime = 5; // Running time
+  int64 compilationTime = 4; // Compilation time
+  int64 runningTime = 5; // Running time
 }

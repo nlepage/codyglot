@@ -5,11 +5,11 @@ RUN apk update && apk add git protobuf protobuf-dev &&\
     go get -v google.golang.org/grpc &&\
     go get -v github.com/golang/protobuf/protoc-gen-go &&\
     go get -v github.com/grpc-ecosystem/grpc-gateway/protoc-gen-grpc-gateway &&\
-    go get -v github.com/grpc-ecosystem/grpc-gateway/protoc-gen-swagger &&\
-    mkdir -p /go/src/github.com/nlepage
-COPY . /go/src/github.com/nlepage/codyglot
+    go get -v github.com/grpc-ecosystem/grpc-gateway/protoc-gen-swagger
+COPY ./Gopkg.* /go/src/github.com/nlepage/codyglot/
 WORKDIR /go/src/github.com/nlepage/codyglot
 RUN dep ensure -v -vendor-only
+COPY . /go/src/github.com/nlepage/codyglot
 RUN protoc -I. \
            -I$GOPATH/src/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis \
            --go_out=plugins=grpc:. \

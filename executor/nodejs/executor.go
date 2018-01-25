@@ -29,8 +29,9 @@ func execute(ctx context.Context, req *service.ExecuteRequest) (*service.Execute
 	}
 
 	return &service.ExecuteResponse{
-		ExitStatus: cmd.ExitStatus(),
-		Stdout:     cmd.Stdout(),
-		Stderr:     cmd.Stderr(),
+		ExitStatus:  cmd.ExitStatus(),
+		Stdout:      cmd.Stdout(),
+		Stderr:      cmd.Stderr(),
+		RunningTime: int64(cmd.Duration()),
 	}, nil
 }

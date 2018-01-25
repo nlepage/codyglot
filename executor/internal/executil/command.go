@@ -3,21 +3,25 @@ package executil
 import (
 	"bytes"
 	"context"
+	"fmt"
 	"io"
 	"os/exec"
 	"syscall"
+	"time"
 
 	"github.com/pkg/errors"
 )
 
 // Cmd is a wrapper for exec.Cmd
 type Cmd struct {
-	cmd     *exec.Cmd
-	stdin   string
-	stdout  *bytes.Buffer
-	stderr  *bytes.Buffer
-	errs    []error
-	exitErr *exec.ExitError
+	cmd       *exec.Cmd
+	stdin     string
+	stdout    *bytes.Buffer
+	stderr    *bytes.Buffer
+	errs      []error
+	exitErr   *exec.ExitError
+	startTime time.Time
+	duration  time.Duration
 }
 
 // Command creates a new Cmd
@@ -47,9 +51,7 @@ func (cmd *Cmd) Run() error {
 
 // ExitStatus returns exit status
 func (cmd *Cmd) ExitStatus() uint32 {
-	if cmd.hasErrors() {
-		panic("Command: Invalid state, ExitStatus() should not be called when there are errors")
-	}
+	cmd.checkErrors("ExitStatus")
 
 	if cmd.exitErr == nil {
 		return 0
@@ -65,19 +67,22 @@ func (cmd *Cmd) ExitStatus() uint32 {
 
 // Stdout returns standard output
 func (cmd *Cmd) Stdout() string {
-	if cmd.hasErrors() {
-		panic("Command: Invalid state, Stdout() should not be called when there are errors")
-	}
+	cmd.checkErrors("Stdout")
 
 	return string(cmd.stdout.Bytes())
 }
 
 // Stderr returns standard error output
 func (cmd *Cmd) Stderr() string {
-	if cmd.hasErrors() {
-		panic("Command: Invalid state, Stderr() should not be called when there are errors")
-	}
+	cmd.checkErrors("Stderr")
+
 	return string(cmd.stderr.Bytes())
+}
+
+func (cmd *Cmd) Duration() time.Duration {
+	cmd.checkErrors("Duration")
+
+	return cmd.duration
 }
 
 func (cmd *Cmd) writeStdin() {
@@ -130,6 +135,8 @@ func (cmd *Cmd) start() {
 		return
 	}
 
+	cmd.startTime = time.Now()
+
 	if err := cmd.cmd.Start(); err != nil {
 		cmd.addError(err, "Failed to start command")
 	}
@@ -148,6 +155,10 @@ func (cmd *Cmd) wait() {
 			cmd.addError(err, "Failed to run command")
 		}
 	}
+
+	defer func() {
+		cmd.duration = time.Since(cmd.startTime)
+	}()
 }
 
 func (cmd *Cmd) addError(err error, message string) {
@@ -172,4 +183,10 @@ func (cmd *Cmd) error() error {
 		message += "\n" + err.Error()
 	}
 	return errors.New(message)
+}
+
+func (cmd *Cmd) checkErrors(name string) {
+	if cmd.hasErrors() {
+		panic(fmt.Sprintf("Command: Invalid state, %s should not be called when there are errors", name))
+	}
 }
