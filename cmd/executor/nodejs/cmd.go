@@ -2,15 +2,15 @@ package golang
 
 import (
 	"github.com/nlepage/codyglot/cmd/executor"
-	"github.com/nlepage/codyglot/executor/golang"
+	"github.com/nlepage/codyglot/executor/nodejs"
 	"github.com/spf13/cobra"
 )
 
 var cmd = &cobra.Command{
-	Use:   "golang",
-	Short: "Start Codyglot Go(lang) executor",
+	Use:   "nodejs",
+	Short: "Start Codyglot NodeJS executor",
 	RunE: func(cmd *cobra.Command, args []string) error {
-		return golang.Executor().Serve(executor.Port)
+		return nodejs.Executor().Serve(executor.Port)
 	},
 }
 

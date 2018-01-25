@@ -1,4 +1,4 @@
-package golang
+package nodejs
 
 import (
 	"context"
@@ -10,19 +10,19 @@ import (
 	"github.com/pkg/errors"
 )
 
-// Executor returns Golang Executor
+// Executor returns NodeJS Executor
 func Executor() executor.Executor {
 	return executor.Executor(execute)
 }
 
-// Execute executes Go(lang) code
+// Execute executes NodeJS code
 func execute(ctx context.Context, req *service.ExecuteRequest) (*service.ExecuteResponse, error) {
-	p, err := srcutil.WriteSourceFile("main.go", req.Source)
+	p, err := srcutil.WriteSourceFile("index.js", req.Source)
 	if err != nil {
 		return nil, err
 	}
 
-	cmd := executil.Command(ctx, "go", "run", p).WithStdin(req.Stdin)
+	cmd := executil.Command(ctx, "node", p).WithStdin(req.Stdin)
 
 	if err = cmd.Run(); err != nil {
 		return nil, errors.Wrap(err, "execute: Failed to run command")

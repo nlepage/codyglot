@@ -10,11 +10,16 @@ services:
 
   router:
     image: nlepage/codyglot:base
-    command: ["router", "server", "-l", "golang:golang:9090"]
+    command: ["router", "server", "-l", "golang:golang:9090", "-l", "nodejs:nodejs:9090"]
     expose:
       - "9090"
 
   golang:
     image: nlepage/codyglot:golang
+    expose:
+      - "9090"
+
+  nodejs:
+    image: nlepage/codyglot:nodejs
     expose:
       - "9090"
