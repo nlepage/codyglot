@@ -5,7 +5,7 @@ import (
 
 	"github.com/nlepage/codyglot/executor"
 	"github.com/nlepage/codyglot/executor/internal/executil"
-	"github.com/nlepage/codyglot/executor/internal/srcutil"
+	"github.com/nlepage/codyglot/executor/internal/tmputil"
 	"github.com/nlepage/codyglot/executor/service"
 	"github.com/pkg/errors"
 )
@@ -17,20 +17,42 @@ func Executor() executor.Executor {
 
 // Execute executes Go(lang) code
 func execute(ctx context.Context, req *service.ExecuteRequest) (*service.ExecuteResponse, error) {
-	p, err := srcutil.WriteSourceFile("main.go", req.Source)
+	tmpDir, err := tmputil.NewTmpDir()
 	if err != nil {
 		return nil, err
 	}
 
-	cmd := executil.Command(ctx, "go", "run", p).WithStdin(req.Stdin)
+	srcFile, err := tmpDir.WriteFile("main.go", req.Source)
+	if err != nil {
+		return nil, errors.Wrap(err, "execute: Failed to write source file")
+	}
 
-	if err = cmd.Run(); err != nil {
-		return nil, errors.Wrap(err, "execute: Failed to run command")
+	binFile := tmpDir.Join("main")
+
+	buildCmd := executil.Command(ctx, "go", "build", "-o", binFile, srcFile)
+
+	if err = buildCmd.Run(); err != nil {
+		return nil, errors.Wrap(err, "execute: Build command failed")
+	}
+
+	if buildCmd.ExitStatus() != 0 {
+		return &service.ExecuteResponse{
+			ExitStatus: buildCmd.ExitStatus(),
+			Stdout:     buildCmd.Stdout(),
+			Stderr:     buildCmd.Stderr(),
+		}, nil
+	}
+
+	runCmd := executil.Command(ctx, binFile).WithStdin(req.Stdin)
+
+	if err := runCmd.Run(); err != nil {
+		return nil, errors.Wrap(err, "execute: Run command failed")
 	}
 
 	return &service.ExecuteResponse{
-		ExitStatus: cmd.ExitStatus(),
-		Stdout:     cmd.Stdout(),
-		Stderr:     cmd.Stderr(),
+		ExitStatus:  runCmd.ExitStatus(),
+		Stdout:      runCmd.Stdout(),
+		Stderr:      runCmd.Stderr(),
+		RunningTime: int64(runCmd.Duration()),
 	}, nil
 }

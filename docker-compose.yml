@@ -20,7 +20,7 @@ services:
     image: nlepage/codyglot:golang
     read_only: true
     tmpfs:
-      - /tmp
+      - /tmp:exec
     expose:
       - "9090"
 

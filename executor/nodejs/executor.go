@@ -5,7 +5,7 @@ import (
 
 	"github.com/nlepage/codyglot/executor"
 	"github.com/nlepage/codyglot/executor/internal/executil"
-	"github.com/nlepage/codyglot/executor/internal/srcutil"
+	"github.com/nlepage/codyglot/executor/internal/tmputil"
 	"github.com/nlepage/codyglot/executor/service"
 	"github.com/pkg/errors"
 )
@@ -17,12 +17,14 @@ func Executor() executor.Executor {
 
 // Execute executes NodeJS code
 func execute(ctx context.Context, req *service.ExecuteRequest) (*service.ExecuteResponse, error) {
-	p, err := srcutil.WriteSourceFile("index.js", req.Source)
+	tmpDir, err := tmputil.NewTmpDir()
+
+	srcFile, err := tmpDir.WriteFile("index.js", req.Source)
 	if err != nil {
 		return nil, err
 	}
 
-	cmd := executil.Command(ctx, "node", p).WithStdin(req.Stdin)
+	cmd := executil.Command(ctx, "node", srcFile).WithStdin(req.Stdin)
 
 	if err = cmd.Run(); err != nil {
 		return nil, errors.Wrap(err, "execute: Failed to run command")
