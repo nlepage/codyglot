@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"os/exec"
+	"sync"
 	"syscall"
 	"time"
 
@@ -15,6 +16,7 @@ import (
 // Cmd is a wrapper for exec.Cmd
 type Cmd struct {
 	cmd       *exec.Cmd
+	wg        sync.WaitGroup
 	stdin     string
 	stdout    *bytes.Buffer
 	stderr    *bytes.Buffer
@@ -26,8 +28,15 @@ type Cmd struct {
 
 // Command creates a new Cmd
 func Command(ctx context.Context, name string, args ...string) *Cmd {
+	cmd := exec.CommandContext(ctx, name, args...)
+
+	stdout, stderr := &bytes.Buffer{}, &bytes.Buffer{}
+	cmd.Stdout, cmd.Stderr = stdout, stderr
+
 	return &Cmd{
-		cmd: exec.CommandContext(ctx, name, args...),
+		cmd:    cmd,
+		stdout: stdout,
+		stderr: stderr,
 	}
 }
 
@@ -40,8 +49,6 @@ func (cmd *Cmd) WithStdin(stdin string) *Cmd {
 // Run runs the command
 func (cmd *Cmd) Run() error {
 	cmd.writeStdin()
-	cmd.stdout = cmd.captureStdxxx(cmd.cmd.StdoutPipe)
-	cmd.stderr = cmd.captureStdxxx(cmd.cmd.StderrPipe)
 
 	cmd.start()
 	cmd.wait()
@@ -96,12 +103,15 @@ func (cmd *Cmd) writeStdin() {
 		return
 	}
 
+	cmd.wg.Add(1)
 	go func() {
+		defer cmd.wg.Done()
 		defer func() {
 			if err := stdinPipe.Close(); err != nil {
 				cmd.addError(err, "Failed to close stdin pipe")
 			}
 		}()
+
 		if _, err := io.WriteString(stdinPipe, cmd.stdin); err != nil {
 			cmd.addError(err, "Failed to write stdin")
 		}
@@ -109,19 +119,22 @@ func (cmd *Cmd) writeStdin() {
 }
 
 func (cmd *Cmd) captureStdxxx(stdxxxPipeProvider func() (io.ReadCloser, error)) *bytes.Buffer {
-	var buf bytes.Buffer
-
 	if cmd.hasErrors() {
-		return &buf
+		return nil
 	}
 
 	stdxxxPipe, err := stdxxxPipeProvider()
 	if err != nil {
 		cmd.addError(err, "Failed to retrieve std(out/err) pipe")
-		return &buf
+		return nil
 	}
 
+	var buf bytes.Buffer
+
+	cmd.wg.Add(1)
 	go func() {
+		defer cmd.wg.Done()
+
 		if _, err := io.Copy(&buf, stdxxxPipe); err != nil {
 			cmd.addError(err, "Failed to read std(out/err)")
 		}
@@ -147,6 +160,10 @@ func (cmd *Cmd) wait() {
 		return
 	}
 
+	defer func() {
+		cmd.duration = time.Since(cmd.startTime)
+	}()
+
 	if err := cmd.cmd.Wait(); err != nil {
 		exitErr, ok := err.(*exec.ExitError)
 		if ok {
@@ -156,9 +173,7 @@ func (cmd *Cmd) wait() {
 		}
 	}
 
-	defer func() {
-		cmd.duration = time.Since(cmd.startTime)
-	}()
+	cmd.wg.Wait()
 }
 
 func (cmd *Cmd) addError(err error, message string) {

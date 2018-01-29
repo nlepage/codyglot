@@ -50,9 +50,10 @@ func execute(ctx context.Context, req *service.ExecuteRequest) (*service.Execute
 	}
 
 	return &service.ExecuteResponse{
-		ExitStatus:  runCmd.ExitStatus(),
-		Stdout:      runCmd.Stdout(),
-		Stderr:      runCmd.Stderr(),
-		RunningTime: int64(runCmd.Duration()),
+		ExitStatus:      runCmd.ExitStatus(),
+		Stdout:          runCmd.Stdout(),
+		Stderr:          runCmd.Stderr(),
+		CompilationTime: int64(buildCmd.Duration()),
+		RunningTime:     int64(runCmd.Duration()),
 	}, nil
 }
