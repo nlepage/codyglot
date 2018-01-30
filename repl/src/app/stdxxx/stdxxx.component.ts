@@ -15,13 +15,6 @@ import { Component, OnInit } from '@angular/core';
       flex-direction: column;
       height: 100%;
     }
-    h2 {
-      background-color: #a66fa6;
-      color: #fff;
-      font-size: 16px;
-      margin: 0;
-      padding: 5px;
-    }
     textarea {
       flex: 1;
       font-family: 'Lucida Grande', sans-serif;

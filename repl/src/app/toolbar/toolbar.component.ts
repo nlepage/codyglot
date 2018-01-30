@@ -1,6 +1,6 @@
 import { Component, OnInit, EventEmitter, Output } from '@angular/core';
 import { LanguageInfo, LanguageService } from '../language.service';
-import { first } from 'lodash';
+import { get } from 'lodash';
 
 @Component({
   selector: 'toolbar',
@@ -22,7 +22,7 @@ export class ToolbarComponent implements OnInit {
     });
   }
 
-  get language() { return this._language.key; }
+  get language() { return get(this._language, 'key'); }
   set language(key: string) {
     this._language = this.languages.find(language => language.key === key);
     this.onSelectLanguage.emit(this._language);

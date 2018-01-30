@@ -1,6 +1,6 @@
 <div class="grid">
   <toolbar (onSelectLanguage)="language = $event"></toolbar>
-  <app-source></app-source>
+  <app-source [language]="language"></app-source>
   <stdxxx class="stdin"></stdxxx>
   <stdxxx class="stdout"></stdxxx>
   <stdxxx class="stderr"></stdxxx>
