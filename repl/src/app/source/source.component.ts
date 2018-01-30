@@ -1,5 +1,5 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
-import { LanguageInfo } from '../language.service'
+import { LanguageInfo } from '../languages.service'
 import 'brace';
 import 'brace/theme/chrome';
 import 'brace/mode/golang';

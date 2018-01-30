@@ -5,5 +5,5 @@
       <option *ngFor="let language of languages" [value]="language.key">{{language.name}}</option>
     </select>
   </div>
-  <button class="pure-button run">Run</button>
+  <button class="pure-button run" (click)="run()">Run</button>
 </div>

@@ -1,5 +1,5 @@
 import { Component, OnInit, EventEmitter, Output } from '@angular/core';
-import { LanguageInfo, LanguageService } from '../language.service';
+import { LanguageInfo, LanguagesService } from '../languages.service';
 import { get } from 'lodash';
 
 @Component({
@@ -12,13 +12,15 @@ export class ToolbarComponent implements OnInit {
   languages: LanguageInfo[];
 
   private _language: LanguageInfo;
-  
+
   @Output() onSelectLanguage = new EventEmitter<LanguageInfo>();
 
-  constructor(private languageService: LanguageService) {}
+  @Output() onRun = new EventEmitter<void>();
+
+  constructor(private languagesService: LanguagesService) {}
 
   ngOnInit() {
-    this.languageService.languages.subscribe(languages => {
+    this.languagesService.languages.subscribe(languages => {
       this.languages = languages;
       this.language = languages[0].key;
     });
@@ -29,4 +31,6 @@ export class ToolbarComponent implements OnInit {
     this._language = this.languages.find(language => language.key === key);
     this.onSelectLanguage.emit(this._language);
   }
+
+  run = () => this.onRun.emit();
 }

@@ -11,7 +11,7 @@ export type LanguageInfo = {
 }
 
 @Injectable()
-export class LanguageService {
+export class LanguagesService {
 
   private languagesInfo = keyBy([
     { key: 'nodejs', name: 'NodeJS', mode: 'javascript' },

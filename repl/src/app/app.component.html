@@ -1,5 +1,5 @@
 <div class="grid">
-  <toolbar (onSelectLanguage)="language = $event"></toolbar>
+  <toolbar (onSelectLanguage)="language = $event" (onRun)="execute()"></toolbar>
   <app-source [language]="language" (onSourceChange)="source = $event"></app-source>
   <stdxxx class="stdin" title="Standard input" (onContentChange)="stdin = $event"></stdxxx>
   <stdxxx class="stdout" title="Standard output" [readonly]="true" [content]="stdout"></stdxxx>

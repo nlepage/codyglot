@@ -9,7 +9,8 @@ import { ToolbarComponent } from './toolbar/toolbar.component';
 import { SourceComponent } from './source/source.component';
 import { StdxxxComponent } from './stdxxx/stdxxx.component';
 
-import { LanguageService } from './language.service';
+import { LanguagesService } from './languages.service';
+import { ExecuteService } from './execute.service';
 
 @NgModule({
   declarations: [
@@ -25,7 +26,8 @@ import { LanguageService } from './language.service';
     AceEditorModule,
   ],
   providers: [
-    LanguageService,
+    LanguagesService,
+    ExecuteService,
   ],
   bootstrap: [AppComponent]
 })
