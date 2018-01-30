@@ -1,6 +1,6 @@
 <div class="grid">
   <toolbar (onSelectLanguage)="language = $event"></toolbar>
-  <app-source [language]="language"></app-source>
+  <app-source [language]="language" (onSourceChange)="source = $event"></app-source>
   <stdxxx class="stdin" title="Standard input" (onContentChange)="stdin = $event"></stdxxx>
   <stdxxx class="stdout" title="Standard output" [readonly]="true" [content]="stdout"></stdxxx>
   <stdxxx class="stderr" title="Standard error" [readonly]="true" [content]="stderr"></stdxxx>

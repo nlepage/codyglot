@@ -1,4 +1,4 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { LanguageInfo } from '../language.service'
 import 'brace';
 import 'brace/theme/chrome';
@@ -13,11 +13,23 @@ import 'brace/mode/javascript';
 export class SourceComponent implements OnInit {
 
   @Input()
-  language: LanguageInfo
+  language: LanguageInfo;
+
+  private _source: string;
+
+  @Output()
+  onSourceChange = new EventEmitter<string>();
 
   constructor() {}
 
   ngOnInit() {
   }
+
+  set source(source: string) {
+    this._source = source;
+    this.onSourceChange.emit(source);
+  }
+
+  get source() { return this._source; }
 
 }
