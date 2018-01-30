@@ -1,5 +1,6 @@
 /vendor/
 /codyglot
+node_modules/
 *.pb.go
 *.pb.gw.go
 *.swagger.json
