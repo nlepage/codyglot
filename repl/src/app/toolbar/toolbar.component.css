@@ -1,0 +1,23 @@
+.flex {
+  align-items: center;
+  background-color: #530e53;
+  display: flex;
+  flex-direction: row;
+  height: 100%;
+}
+
+h1 {
+  color: #fff;
+  font-size: 20px;
+  margin-left: 20px;
+}
+
+.language {
+  margin-left: 20px;
+}
+
+.run {
+  background-color: #8a458a;
+  color: #fff;
+  margin-left: 20px;
+}

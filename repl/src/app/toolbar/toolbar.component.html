@@ -1,0 +1,9 @@
+<div class="flex">
+  <h1>Codyglot REPL</h1>
+  <div class="language pure-form">
+    <select [(ngModel)]="language">
+      <option *ngFor="let language of languages" [value]="language.key">{{language.name}}</option>
+    </select>
+  </div>
+  <button class="pure-button run">Run</button>
+</div>

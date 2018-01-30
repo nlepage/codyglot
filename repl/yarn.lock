@@ -181,6 +181,10 @@
   dependencies:
     typescript "~2.6.2"
 
+"@types/lodash@^4.14.98":
+  version "4.14.98"
+  resolved "https://registry.yarnpkg.com/@types/lodash/-/lodash-4.14.98.tgz#aaf012ae443e657e7885e605a4c1b340db160609"
+
 abbrev@1:
   version "1.1.1"
   resolved "https://registry.yarnpkg.com/abbrev/-/abbrev-1.1.1.tgz#f8f2c887ad10bf67f634f005b6987fed3179aac8"

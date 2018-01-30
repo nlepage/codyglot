@@ -1,7 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import 'brace';
-import 'brace/mode/javascript';
 import 'brace/theme/chrome';
+import 'brace/mode/golang';
+import 'brace/mode/javascript';
 
 @Component({
   selector: 'app-source',

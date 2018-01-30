@@ -1,49 +1,30 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, EventEmitter, Output } from '@angular/core';
+import { LanguageInfo, LanguageService } from '../language.service';
+import { first } from 'lodash';
 
 @Component({
   selector: 'toolbar',
-  template: `
-    <div class="flex">
-      <h1>Codyglot REPL</h1>
-      <div class="language pure-form">
-        <select>
-          <option>Go(Lang)</option>
-          <option>NodeJS</option>
-        </select>
-      </div>
-      <button class="pure-button run">Run</button>
-    </div>
-  `,
-  styles: [
-    `
-    .flex {
-      align-items: center;
-      background-color: #530e53;
-      display: flex;
-      flex-direction: row;
-      height: 100%;
-    }
-    h1 {
-      color: #fff;
-      font-size: 20px;
-      margin-left: 20px;
-    }
-    .language {
-      margin-left: 20px;
-    }
-    .run {
-      background-color: #8a458a;
-      color: #fff;
-      margin-left: 20px;
-    }
-    `
-  ]
+  templateUrl: './toolbar.component.html',
+  styleUrls: ['./toolbar.component.css']
 })
 export class ToolbarComponent implements OnInit {
 
-  constructor() { }
+  languages: LanguageInfo[];
+  private _language: LanguageInfo;
+  @Output() onSelectLanguage = new EventEmitter<LanguageInfo>();
+
+  constructor(private languageService: LanguageService) {}
 
   ngOnInit() {
+    this.languageService.languages.subscribe(languages => {
+      this.languages = languages;
+      this.language = languages[0].key;
+    });
   }
 
+  get language() { return this._language.key; }
+  set language(key: string) {
+    this._language = this.languages.find(language => language.key === key);
+    this.onSelectLanguage.emit(this._language);
+  }
 }
