@@ -10,7 +10,9 @@ import { get } from 'lodash';
 export class ToolbarComponent implements OnInit {
 
   languages: LanguageInfo[];
+
   private _language: LanguageInfo;
+  
   @Output() onSelectLanguage = new EventEmitter<LanguageInfo>();
 
   constructor(private languageService: LanguageService) {}

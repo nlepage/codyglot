@@ -1,4 +1,4 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, Input, EventEmitter, Output } from '@angular/core';
 
 @Component({
   selector: 'stdxxx',
@@ -8,17 +8,26 @@ import { Component, OnInit, Input } from '@angular/core';
 export class StdxxxComponent implements OnInit {
 
   @Input()
-  title: string
+  title: string;
 
   @Input()
-  readonly = false
+  readonly = false;
 
-  @Input()
-  content: string
+  private _content: string;
 
-  constructor() { }
+  @Output() onContentChange = new EventEmitter<string>();
+
+  constructor() {}
 
   ngOnInit() {
   }
+
+  @Input()
+  set content(content: string) {
+    this._content = content;
+    this.onContentChange.emit(content);
+  }
+
+  get content() { return this._content; }
 
 }
