@@ -9,4 +9,8 @@ import { LanguageInfo } from './language.service'
 export class AppComponent {
 
   language: LanguageInfo;
+  source: string;
+  stdin: string;
+  stdout: string = 'stdout\nstdout';
+  stderr: string = 'stderr\nstderr';
 }
