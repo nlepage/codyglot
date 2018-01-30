@@ -2,11 +2,16 @@ version: "3"
 
 services:
 
+  repl:
+    image: nlepage/codyglot:repl
+    ports:
+      - "80"
+
   gateway:
     image: nlepage/codyglot:base
     read_only: true
     command: ["router", "gateway", "-e", "router:9090"]
-    ports:
+    expose:
       - "8080"
 
   router:

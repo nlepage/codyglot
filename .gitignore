@@ -1,5 +1,6 @@
 /vendor/
 /codyglot
+dist/
 node_modules/
 *.pb.go
 *.pb.gw.go
