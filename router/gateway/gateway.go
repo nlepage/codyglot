@@ -5,16 +5,14 @@ import (
 	"fmt"
 	"net/http"
 
-	router "github.com/nlepage/codyglot/router/service"
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
+	"github.com/nlepage/codyglot/config/router/gateway"
+	router "github.com/nlepage/codyglot/router/service"
 	"google.golang.org/grpc"
 )
 
 // Gateway is Codyglot router gateway
-type Gateway struct {
-	Port     int
-	Endpoint string
-}
+type Gateway struct{}
 
 // Serve starts listening for HTTP requests
 func (gw *Gateway) Serve() error {
@@ -24,10 +22,10 @@ func (gw *Gateway) Serve() error {
 
 	mux := runtime.NewServeMux()
 	opts := []grpc.DialOption{grpc.WithInsecure()}
-	err := router.RegisterRouterHandlerFromEndpoint(ctx, mux, gw.Endpoint, opts)
+	err := router.RegisterRouterHandlerFromEndpoint(ctx, mux, config.Endpoint, opts)
 	if err != nil {
 		return err
 	}
 
-	return http.ListenAndServe(fmt.Sprintf(":%d", gw.Port), mux)
+	return http.ListenAndServe(fmt.Sprintf(":%d", config.Port), mux)
 }

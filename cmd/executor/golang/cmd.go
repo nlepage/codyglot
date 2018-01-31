@@ -10,7 +10,7 @@ var cmd = &cobra.Command{
 	Use:   "golang",
 	Short: "Start Codyglot Go(lang) executor",
 	RunE: func(cmd *cobra.Command, args []string) error {
-		return golang.Executor().Serve(executor.Port)
+		return golang.Executor().Serve()
 	},
 }
 

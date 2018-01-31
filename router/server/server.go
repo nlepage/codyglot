@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net"
 
+	config "github.com/nlepage/codyglot/config/router/server"
 	executor "github.com/nlepage/codyglot/executor/service"
 	router "github.com/nlepage/codyglot/router/service"
 	"github.com/pkg/errors"
@@ -12,14 +13,16 @@ import (
 )
 
 // Server is Codyglot router gRPC server
-type Server struct {
-	LanguagesMap map[string]string
-	Port         int
+type Server struct{}
+
+// Init initializes the router server
+func Init() error {
+	return config.InitLanguagesMap()
 }
 
 // Serve starts listening for gRPC requests
 func (s *Server) Serve() error {
-	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", s.Port))
+	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", config.Port))
 	if err != nil {
 		return fmt.Errorf("Failed to listen: %v", err)
 	}
@@ -35,13 +38,13 @@ func (s *Server) Serve() error {
 
 // Execute forwards a code request execution to an executor
 func (s *Server) Execute(ctx context.Context, req *router.ExecuteRequest) (*router.ExecuteResponse, error) {
-	target, ok := s.LanguagesMap[req.Language]
+	endpoint, ok := config.LanguagesMap[req.Language]
 	if !ok {
-		return nil, fmt.Errorf("Router: No executor for language %s", req.Language)
+		return nil, fmt.Errorf("Config: No executor endpoint for language %s", req.Language)
 	}
 
 	opts := []grpc.DialOption{grpc.WithInsecure()}
-	conn, err := grpc.Dial(target, opts...)
+	conn, err := grpc.Dial(endpoint, opts...)
 	if err != nil {
 		return nil, errors.Wrap(err, "Router: could not create executor dial context")
 	}
@@ -68,10 +71,10 @@ func (s *Server) Execute(ctx context.Context, req *router.ExecuteRequest) (*rout
 // Languages lists languages for which an executor is available
 func (s *Server) Languages(ctx context.Context, req *router.LanguagesRequest) (*router.LanguagesResponse, error) {
 	res := router.LanguagesResponse{
-		Languages: make([]string, 0, len(s.LanguagesMap)),
+		Languages: make([]string, 0, len(config.LanguagesMap)),
 	}
 
-	for language := range s.LanguagesMap {
+	for language := range config.LanguagesMap {
 		res.Languages = append(res.Languages, language)
 	}
 

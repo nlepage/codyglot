@@ -18,6 +18,10 @@ func Executor() executor.Executor {
 // Execute executes NodeJS code
 func execute(ctx context.Context, req *service.ExecuteRequest) (*service.ExecuteResponse, error) {
 	tmpDir, err := tmputil.NewTmpDir()
+	if err != nil {
+		return nil, err
+	}
+	defer tmpDir.Close()
 
 	srcFile, err := tmpDir.WriteFile("index.js", req.Source)
 	if err != nil {

@@ -6,27 +6,30 @@ import (
 	"os"
 	"path"
 
+	config "github.com/nlepage/codyglot/config/executor"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 )
 
 const (
-	tempDirPrefix         = "codyglot"
-	defaultClosedBuffer   = 10
-	defaultCloserRoutines = 2
+	tempDirPrefix = "codyglot"
 )
 
 var (
-	closed = make(chan string, defaultClosedBuffer)
+	closed chan string
 )
 
+// TmpDir is a temporary directory
 type TmpDir struct {
 	path   string
 	closed bool
 }
 
-func init() {
-	for i := 0; i < defaultCloserRoutines; i++ {
+// StartCleanup fires up the cleanup routines
+func StartCleanup() {
+	closed = make(chan string, config.CleanupBuffer)
+
+	for i := 0; i < config.CleanupRoutines; i++ {
 		go func() {
 			for path := range closed {
 				if err := os.RemoveAll(path); err != nil {
@@ -37,6 +40,7 @@ func init() {
 	}
 }
 
+// NewTmpDir creates a new TmpDir
 func NewTmpDir() (*TmpDir, error) {
 	path, err := ioutil.TempDir("", tempDirPrefix)
 	if err != nil {
@@ -48,6 +52,7 @@ func NewTmpDir() (*TmpDir, error) {
 	}, nil
 }
 
+// Join joins sub paths to the path of TmpDir
 func (td *TmpDir) Join(paths ...string) string {
 	td.checkClosed("Join")
 
@@ -57,6 +62,7 @@ func (td *TmpDir) Join(paths ...string) string {
 	return path.Join(fullPaths...)
 }
 
+// WriteFile writes a file in TmpDir
 func (td *TmpDir) WriteFile(name string, content string) (string, error) {
 	td.checkClosed("WriteFile")
 
@@ -78,10 +84,11 @@ func (td *TmpDir) WriteFile(name string, content string) (string, error) {
 
 func (td *TmpDir) checkClosed(name string) {
 	if td.closed {
-		panic(fmt.Sprintf("TmpDir: Invalid state, %s should not be called after closing temp dir"))
+		panic(fmt.Sprintf("TmpDir: Invalid state, %s should not be called after closing temp dir", name))
 	}
 }
 
+// Close marks the TmpDir closed and sends it to cleanup routines
 func (td *TmpDir) Close() {
 	td.checkClosed("Close")
 

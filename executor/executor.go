@@ -5,11 +5,18 @@ import (
 	"fmt"
 	"net"
 
+	config "github.com/nlepage/codyglot/config/executor"
+	"github.com/nlepage/codyglot/executor/internal/tmputil"
 	"github.com/nlepage/codyglot/executor/service"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
 )
+
+// Init initializes the executor
+func Init() {
+	tmputil.StartCleanup()
+}
 
 // Executor is a function implementing ExecutorServer
 type Executor func(context.Context, *service.ExecuteRequest) (*service.ExecuteResponse, error)
@@ -22,10 +29,10 @@ func (e Executor) Execute(ctx context.Context, req *service.ExecuteRequest) (*se
 var _ service.ExecutorServer = Executor(nil)
 
 // Serve starts listening for gRPC requests
-func (e Executor) Serve(port int) error {
-	log.Infoln("Starting executor on port", port)
+func (e Executor) Serve() error {
+	log.Infoln("Starting executor on port", config.Port)
 
-	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", port))
+	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", config.Port))
 	if err != nil {
 		return errors.Wrap(err, "Executor: Failed to listen")
 	}
