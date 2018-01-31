@@ -1,20 +1,40 @@
 package tmputil
 
 import (
+	"fmt"
 	"io/ioutil"
 	"os"
 	"path"
 
 	"github.com/pkg/errors"
+	log "github.com/sirupsen/logrus"
 )
 
 const (
-	tempDirPrefix = "codyglot"
+	tempDirPrefix         = "codyglot"
+	defaultClosedBuffer   = 10
+	defaultCloserRoutines = 2
+)
+
+var (
+	closed = make(chan string, defaultClosedBuffer)
 )
 
 type TmpDir struct {
 	path   string
 	closed bool
+}
+
+func init() {
+	for i := 0; i < defaultCloserRoutines; i++ {
+		go func() {
+			for path := range closed {
+				if err := os.RemoveAll(path); err != nil {
+					log.Errorln("Failed to remove temp dir", path)
+				}
+			}
+		}()
+	}
 }
 
 func NewTmpDir() (*TmpDir, error) {
@@ -29,6 +49,8 @@ func NewTmpDir() (*TmpDir, error) {
 }
 
 func (td *TmpDir) Join(paths ...string) string {
+	td.checkClosed("Join")
+
 	fullPaths := make([]string, len(paths)+1)
 	fullPaths[0] = td.path
 	copy(fullPaths[1:], paths)
@@ -36,6 +58,8 @@ func (td *TmpDir) Join(paths ...string) string {
 }
 
 func (td *TmpDir) WriteFile(name string, content string) (string, error) {
+	td.checkClosed("WriteFile")
+
 	p := td.Join(name)
 
 	f, err := os.Create(p)
@@ -52,6 +76,15 @@ func (td *TmpDir) WriteFile(name string, content string) (string, error) {
 	return p, nil
 }
 
+func (td *TmpDir) checkClosed(name string) {
+	if td.closed {
+		panic(fmt.Sprintf("TmpDir: Invalid state, %s should not be called after closing temp dir"))
+	}
+}
+
 func (td *TmpDir) Close() {
+	td.checkClosed("Close")
+
 	td.closed = true
+	closed <- td.path
 }

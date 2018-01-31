@@ -21,6 +21,7 @@ func execute(ctx context.Context, req *service.ExecuteRequest) (*service.Execute
 	if err != nil {
 		return nil, err
 	}
+	defer tmpDir.Close()
 
 	srcFile, err := tmpDir.WriteFile("main.go", req.Source)
 	if err != nil {
