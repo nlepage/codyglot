@@ -1,4 +1,4 @@
-package codyglot
+package cmd
 
 import (
 	log "github.com/sirupsen/logrus"

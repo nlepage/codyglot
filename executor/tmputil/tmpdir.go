@@ -6,7 +6,7 @@ import (
 	"os"
 	"path"
 
-	config "github.com/nlepage/codyglot/config/executor"
+	"github.com/nlepage/codyglot/executor/config"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 )

@@ -1,16 +1,23 @@
 package cmd
 
 import (
-	"github.com/nlepage/codyglot/cmd/codyglot"
-
-	// Import subcommands
-	_ "github.com/nlepage/codyglot/cmd/executor"
-	_ "github.com/nlepage/codyglot/cmd/executor/golang"
-	_ "github.com/nlepage/codyglot/cmd/executor/nodejs"
-	_ "github.com/nlepage/codyglot/cmd/router"
-	_ "github.com/nlepage/codyglot/cmd/router/gateway"
-	_ "github.com/nlepage/codyglot/cmd/router/server"
+	log "github.com/sirupsen/logrus"
+	"github.com/spf13/cobra"
 )
 
-// Cmd is the main command
-var Cmd = codyglot.Cmd
+var (
+	logLevel = logLevelValue{log.GetLevel()}
+)
+
+// Cmd is the root command
+var Cmd = &cobra.Command{
+	Short: "Codygloy is a polyglot code execution tool",
+	Use:   "codyglot",
+	PersistentPreRun: func(cmd *cobra.Command, args []string) {
+		log.SetLevel(log.Level(logLevel.Level))
+	},
+}
+
+func init() {
+	Cmd.PersistentFlags().Var(&logLevel, "log-level", "Log level (panic, fatal, error, warn, info, debug)")
+}

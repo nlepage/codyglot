@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"net"
 
-	config "github.com/nlepage/codyglot/config/router/server"
 	executor "github.com/nlepage/codyglot/executor/service"
+	"github.com/nlepage/codyglot/router/server/config"
 	router "github.com/nlepage/codyglot/router/service"
 	"github.com/pkg/errors"
 	"google.golang.org/grpc"

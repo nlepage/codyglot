@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"net"
 
-	config "github.com/nlepage/codyglot/config/executor"
-	"github.com/nlepage/codyglot/executor/internal/tmputil"
+	config "github.com/nlepage/codyglot/executor/config"
 	"github.com/nlepage/codyglot/executor/service"
+	"github.com/nlepage/codyglot/executor/tmputil"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 	"google.golang.org/grpc"

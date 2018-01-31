@@ -1,9 +1,9 @@
-package executor
+package cmd
 
 import (
-	"github.com/nlepage/codyglot/cmd/codyglot"
-	config "github.com/nlepage/codyglot/config/executor"
+	"github.com/nlepage/codyglot/cmd"
 	"github.com/nlepage/codyglot/executor"
+	"github.com/nlepage/codyglot/executor/config"
 	"github.com/spf13/cobra"
 )
 
@@ -11,7 +11,7 @@ import (
 var Cmd = &cobra.Command{
 	Short: "Codyglot executor commands",
 	Use:   "executor",
-	PersistentPreRun: func(cmd *cobra.Command, args []string) {
+	PersistentPreRun: func(_ *cobra.Command, _ []string) {
 		executor.Init()
 	},
 }
@@ -20,5 +20,5 @@ func init() {
 	Cmd.PersistentFlags().IntVarP(&config.Port, "port", "p", config.DefaultPort, "Listening port")
 	Cmd.PersistentFlags().IntVar(&config.CleanupBuffer, "cleanup-buffer", config.DefaultCleanupBuffer, "Size of the cleanup buffer")
 	Cmd.PersistentFlags().IntVar(&config.CleanupRoutines, "cleanup-routines", config.DefaultCleanupRoutines, "Number of cleanup routines")
-	codyglot.Cmd.AddCommand(Cmd)
+	cmd.Cmd.AddCommand(Cmd)
 }

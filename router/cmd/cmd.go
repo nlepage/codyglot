@@ -1,7 +1,7 @@
-package router
+package cmd
 
 import (
-	"github.com/nlepage/codyglot/cmd/codyglot"
+	"github.com/nlepage/codyglot/cmd"
 	"github.com/spf13/cobra"
 )
 
@@ -12,5 +12,5 @@ var Cmd = &cobra.Command{
 }
 
 func init() {
-	codyglot.Cmd.AddCommand(Cmd)
+	cmd.Cmd.AddCommand(Cmd)
 }

@@ -4,9 +4,9 @@ import (
 	"context"
 
 	"github.com/nlepage/codyglot/executor"
-	"github.com/nlepage/codyglot/executor/internal/executil"
-	"github.com/nlepage/codyglot/executor/internal/tmputil"
+	"github.com/nlepage/codyglot/executor/executil"
 	"github.com/nlepage/codyglot/executor/service"
+	"github.com/nlepage/codyglot/executor/tmputil"
 	"github.com/pkg/errors"
 )
 

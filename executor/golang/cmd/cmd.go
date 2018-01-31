@@ -1,19 +1,19 @@
-package golang
+package cmd
 
 import (
-	"github.com/nlepage/codyglot/cmd/executor"
+	"github.com/nlepage/codyglot/executor/cmd"
 	"github.com/nlepage/codyglot/executor/golang"
 	"github.com/spf13/cobra"
 )
 
-var cmd = &cobra.Command{
+var _cmd = &cobra.Command{
 	Use:   "golang",
 	Short: "Start Codyglot Go(lang) executor",
-	RunE: func(cmd *cobra.Command, args []string) error {
+	RunE: func(_ *cobra.Command, _ []string) error {
 		return golang.Executor().Serve()
 	},
 }
 
 func init() {
-	executor.Cmd.AddCommand(cmd)
+	cmd.Cmd.AddCommand(_cmd)
 }
