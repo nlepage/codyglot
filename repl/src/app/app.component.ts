@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { LanguageInfo } from './languages.service'
-import { ExecuteService } from './execute.service'
+import { ExecuteResult, ExecuteService } from './execute.service'
 
 @Component({
   selector: 'app-root',
@@ -12,14 +12,10 @@ export class AppComponent {
   language: LanguageInfo;
   source: string;
   stdin: string;
-  stdout: string;
-  stderr: string;
+  result: ExecuteResult;
 
   constructor(private executeService: ExecuteService) {
-    this.executeService.result.subscribe(({ stdout, stderr }) => {
-      this.stdout = stdout;
-      this.stderr = stderr;
-    })
+    this.executeService.result.subscribe(result => this.result = result);
   }
 
   execute = () => {

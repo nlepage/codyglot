@@ -61,10 +61,11 @@ func (s *Server) Execute(ctx context.Context, req *router.ExecuteRequest) (*rout
 	}
 
 	return &router.ExecuteResponse{
-		ExitStatus:  res.ExitStatus,
-		Stderr:      res.Stderr,
-		Stdout:      res.Stdout,
-		RunningTime: res.RunningTime,
+		ExitStatus:      res.ExitStatus,
+		Stderr:          res.Stderr,
+		Stdout:          res.Stdout,
+		CompilationTime: res.CompilationTime,
+		RunningTime:     res.RunningTime,
 	}, nil
 }
 

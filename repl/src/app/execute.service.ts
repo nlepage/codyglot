@@ -2,9 +2,11 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Subject } from 'rxjs';
 
-type ExecuteResult = {
+export type ExecuteResult = {
   stdout: string,
   stderr: string,
+  compilationTime: string,
+  runningTime: string,
 }
 
 @Injectable()

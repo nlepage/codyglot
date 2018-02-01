@@ -1,4 +1,4 @@
-import { Component, OnInit, EventEmitter, Output } from '@angular/core';
+import { Component, OnInit, Input, EventEmitter, Output } from '@angular/core';
 import { LanguageInfo, LanguagesService } from '../languages.service';
 import { get } from 'lodash';
 
@@ -16,6 +16,10 @@ export class ToolbarComponent implements OnInit {
   @Output() onSelectLanguage = new EventEmitter<LanguageInfo>();
 
   @Output() onRun = new EventEmitter<void>();
+
+  @Input() compilationTime: string;
+
+  @Input() runningTime: string;
 
   constructor(private languagesService: LanguagesService) {}
 

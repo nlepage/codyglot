@@ -1,7 +1,7 @@
 <div class="grid">
-  <toolbar (onSelectLanguage)="language = $event" (onRun)="execute()"></toolbar>
+  <toolbar (onSelectLanguage)="language = $event" (onRun)="execute()" [compilationTime]="result?.compilationTime" [runningTime]="result?.runningTime"></toolbar>
   <app-source [language]="language" (onSourceChange)="source = $event"></app-source>
   <stdxxx class="stdin" title="Standard input" (onContentChange)="stdin = $event"></stdxxx>
-  <stdxxx class="stdout" title="Standard output" [readonly]="true" [content]="stdout"></stdxxx>
-  <stdxxx class="stderr" title="Standard error" [readonly]="true" [content]="stderr"></stdxxx>
+  <stdxxx class="stdout" title="Standard output" [readonly]="true" [content]="result?.stdout"></stdxxx>
+  <stdxxx class="stderr" title="Standard error" [readonly]="true" [content]="result?.stderr"></stdxxx>
 </div>
