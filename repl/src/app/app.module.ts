@@ -8,6 +8,7 @@ import { AppComponent } from './app.component';
 import { ToolbarComponent } from './toolbar/toolbar.component';
 import { SourceComponent } from './source/source.component';
 import { StdxxxComponent } from './stdxxx/stdxxx.component';
+import { LoadingComponent } from './loading/loading.component';
 
 import { LanguagesService } from './languages.service';
 import { ExecuteService } from './execute.service';
@@ -18,6 +19,7 @@ import { ExecuteService } from './execute.service';
     ToolbarComponent,
     SourceComponent,
     StdxxxComponent,
+    LoadingComponent,
   ],
   imports: [
     BrowserModule,

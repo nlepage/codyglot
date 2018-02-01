@@ -19,7 +19,9 @@ h1 {
 .run {
   background-color: #8a458a;
   color: #fff;
+  line-height: 20px;
   margin-left: 20px;
+  width: 80px;
 }
 
 .time {

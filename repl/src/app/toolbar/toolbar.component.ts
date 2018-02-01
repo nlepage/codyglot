@@ -17,6 +17,8 @@ export class ToolbarComponent implements OnInit {
 
   @Output() onRun = new EventEmitter<void>();
 
+  @Input() executing: boolean;
+
   @Input() compilationTime: string;
 
   @Input() runningTime: string;

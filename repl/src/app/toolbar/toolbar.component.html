@@ -5,7 +5,11 @@
       <option *ngFor="let language of languages" [value]="language.key">{{language.name}}</option>
     </select>
   </div>
-  <button class="pure-button run" (click)="run()">Run</button>
+  <button class="pure-button run" (click)="run()" [disabled]="executing">
+    <span *ngIf="!executing">▶</span>
+    <loading *ngIf="executing"></loading>
+    Run
+  </button>
   <div class="time" *ngIf="compilationTime">Compiled in {{compilationTime / 1000000 | number:'1.0-2'}}ms</div>
   <div class="time" *ngIf="runningTime">Ran in {{runningTime / 1000000 | number:'1.0-2'}}ms</div>
 </div>
