@@ -5,9 +5,8 @@ import (
 	"fmt"
 	"net"
 
-	executor "github.com/nlepage/codyglot/executor/service"
 	"github.com/nlepage/codyglot/router/server/config"
-	router "github.com/nlepage/codyglot/router/service"
+	"github.com/nlepage/codyglot/service"
 	"github.com/pkg/errors"
 	"google.golang.org/grpc"
 )
@@ -28,7 +27,7 @@ func (s *Server) Serve() error {
 	}
 
 	grpcSrv := grpc.NewServer()
-	router.RegisterRouterServer(grpcSrv, s)
+	service.RegisterCodyglotServer(grpcSrv, s)
 	if err := grpcSrv.Serve(lis); err != nil {
 		return fmt.Errorf("Failed to serve: %v", err)
 	}
@@ -37,7 +36,7 @@ func (s *Server) Serve() error {
 }
 
 // Execute forwards a code request execution to an executor
-func (s *Server) Execute(ctx context.Context, req *router.ExecuteRequest) (*router.ExecuteResponse, error) {
+func (s *Server) Execute(ctx context.Context, req *service.ExecuteRequest) (*service.ExecuteResponse, error) {
 	endpoint, ok := config.LanguagesMap[req.Language]
 	if !ok {
 		return nil, fmt.Errorf("Config: No executor endpoint for language %s", req.Language)
@@ -50,9 +49,9 @@ func (s *Server) Execute(ctx context.Context, req *router.ExecuteRequest) (*rout
 	}
 	defer conn.Close()
 
-	client := executor.NewExecutorClient(conn)
+	client := service.NewCodyglotClient(conn)
 
-	res, err := client.Execute(ctx, &executor.ExecuteRequest{
+	res, err := client.Execute(ctx, &service.ExecuteRequest{
 		Source: req.Source,
 		Stdin:  req.Stdin,
 	})
@@ -60,7 +59,7 @@ func (s *Server) Execute(ctx context.Context, req *router.ExecuteRequest) (*rout
 		return nil, errors.Wrap(err, "Router: an error occured while executing request to executor")
 	}
 
-	return &router.ExecuteResponse{
+	return &service.ExecuteResponse{
 		ExitStatus:      res.ExitStatus,
 		Stderr:          res.Stderr,
 		Stdout:          res.Stdout,
@@ -70,8 +69,8 @@ func (s *Server) Execute(ctx context.Context, req *router.ExecuteRequest) (*rout
 }
 
 // Languages lists languages for which an executor is available
-func (s *Server) Languages(ctx context.Context, req *router.LanguagesRequest) (*router.LanguagesResponse, error) {
-	res := router.LanguagesResponse{
+func (s *Server) Languages(ctx context.Context, req *service.LanguagesRequest) (*service.LanguagesResponse, error) {
+	res := service.LanguagesResponse{
 		Languages: make([]string, 0, len(config.LanguagesMap)),
 	}
 
@@ -82,4 +81,4 @@ func (s *Server) Languages(ctx context.Context, req *router.LanguagesRequest) (*
 	return &res, nil
 }
 
-var _ router.RouterServer = (*Server)(nil)
+var _ service.CodyglotServer = (*Server)(nil)

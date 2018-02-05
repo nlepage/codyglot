@@ -1,5 +1,5 @@
 ### Install
-See [gRPC setup](../../docs/GRPC_SETUP.md)
+See [gRPC setup](../docs/GRPC_SETUP.md)
 
 ### Build
 #### Generate gRPC stub

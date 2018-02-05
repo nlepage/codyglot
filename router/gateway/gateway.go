@@ -7,7 +7,7 @@ import (
 
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"github.com/nlepage/codyglot/router/gateway/config"
-	"github.com/nlepage/codyglot/router/service"
+	"github.com/nlepage/codyglot/service"
 	"google.golang.org/grpc"
 )
 
@@ -22,7 +22,7 @@ func (gw *Gateway) Serve() error {
 
 	mux := runtime.NewServeMux()
 	opts := []grpc.DialOption{grpc.WithInsecure()}
-	err := service.RegisterRouterHandlerFromEndpoint(ctx, mux, config.Endpoint, opts)
+	err := service.RegisterCodyglotHandlerFromEndpoint(ctx, mux, config.Endpoint, opts)
 	if err != nil {
 		return err
 	}

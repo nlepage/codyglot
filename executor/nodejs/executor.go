@@ -5,14 +5,14 @@ import (
 
 	"github.com/nlepage/codyglot/executor"
 	"github.com/nlepage/codyglot/executor/executil"
-	"github.com/nlepage/codyglot/executor/service"
 	"github.com/nlepage/codyglot/executor/tmputil"
+	"github.com/nlepage/codyglot/service"
 	"github.com/pkg/errors"
 )
 
 // Executor returns NodeJS Executor
-func Executor() executor.Executor {
-	return executor.Executor(execute)
+func Executor() *executor.Executor {
+	return executor.New(execute, []string{"javascript"})
 }
 
 // Execute executes NodeJS code

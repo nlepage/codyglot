@@ -1,17 +1,18 @@
 syntax = "proto3";
 
-package com.github.nlepage.codyglot.router.service;
+package com.github.nlepage.codyglot.service;
 option go_package = "service";
 
 import "google/api/annotations.proto";
 
-service Router {
+service Codyglot {
   rpc execute(ExecuteRequest) returns (ExecuteResponse) {
     option (google.api.http) = {
       post: "/execute"
       body: "*"
     };
   }
+
   rpc languages(LanguagesRequest) returns (LanguagesResponse) {
     option (google.api.http) = {
       get: "/languages"
@@ -20,7 +21,7 @@ service Router {
 }
 
 message ExecuteRequest {
-  string language = 1; // Language of the code to execute
+  string language = 1; // Language of the source code to execute
   string source = 2; // Source code to execute
   string stdin = 3; // Content sent on the standard input
 }

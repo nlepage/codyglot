@@ -5,14 +5,14 @@ import (
 
 	"github.com/nlepage/codyglot/executor"
 	"github.com/nlepage/codyglot/executor/executil"
-	"github.com/nlepage/codyglot/executor/service"
 	"github.com/nlepage/codyglot/executor/tmputil"
+	"github.com/nlepage/codyglot/service"
 	"github.com/pkg/errors"
 )
 
 // Executor returns Golang Executor
-func Executor() executor.Executor {
-	return executor.Executor(execute)
+func Executor() *executor.Executor {
+	return executor.New(execute, []string{"golang"})
 }
 
 // Execute executes Go(lang) code

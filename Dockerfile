@@ -13,15 +13,11 @@ COPY . /go/src/github.com/nlepage/codyglot
 RUN protoc -I. \
            -I$GOPATH/src/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis \
            --go_out=plugins=grpc:. \
-           router/service/router.proto &&\
+           service/router.proto &&\
     protoc -I. \
            -I$GOPATH/src/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis \
            --grpc-gateway_out=logtostderr=true:. \
-           router/service/router.proto &&\
-    protoc -I. \
-           -I$GOPATH/src/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis \
-           --go_out=plugins=grpc:. \
-           executor/service/executor.proto &&\
+           service/router.proto &&\
     go install
 
 FROM alpine:3.6
