@@ -16,7 +16,7 @@ export interface LanguageInfo {
 export class LanguagesService {
 
   private languagesInfo = keyBy([
-    { key: 'nodejs', name: 'NodeJS', mode: 'javascript' },
+    { key: 'javascript', name: 'JavaScript', mode: 'javascript' },
     { key: 'golang', name: 'Go(lang)', mode: 'golang' },
   ], 'key');
 

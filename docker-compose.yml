@@ -17,7 +17,7 @@ services:
   router:
     image: nlepage/codyglot:base
     read_only: true
-    command: ["router", "server", "-l", "golang:golang:9090", "-l", "nodejs:nodejs:9090"]
+    command: ["router", "server"]
     expose:
       - "9090"
 

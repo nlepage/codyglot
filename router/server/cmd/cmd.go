@@ -20,6 +20,6 @@ var _cmd = &cobra.Command{
 
 func init() {
 	_cmd.Flags().IntVarP(&config.Port, "port", "p", config.DefaultPort, "Listening port")
-	_cmd.Flags().StringSliceVarP(&config.Languages, "language", "l", nil, "Language")
+	_cmd.Flags().StringSliceVarP(&config.Executors, "executor", "e", config.DefaultExecutors, "Executor hostname")
 	cmd.Cmd.AddCommand(_cmd)
 }
