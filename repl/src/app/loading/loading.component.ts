@@ -1,22 +1,22 @@
-import { Component, OnDestroy, OnInit } from "@angular/core";
+import { Component, OnDestroy, OnInit } from '@angular/core';
 
 @Component({
-  selector: "loading",
-  templateUrl: "./loading.component.html",
+  selector: 'app-loading',
+  templateUrl: './loading.component.html',
 })
 export class LoadingComponent implements OnInit, OnDestroy {
 
-  public interval: number;
+  interval: number;
 
-  public angle = 0;
+  angle = 0;
 
-  public ngOnInit() {
+  ngOnInit() {
     this.interval = window.setInterval(() => {
       this.angle = (this.angle + 0.1) % 1;
     }, 50);
   }
 
-  public ngOnDestroy() {
+  ngOnDestroy() {
     window.clearInterval(this.interval);
   }
 

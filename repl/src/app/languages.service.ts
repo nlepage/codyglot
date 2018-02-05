@@ -1,12 +1,12 @@
-import { HttpClient } from "@angular/common/http";
-import { Injectable } from "@angular/core";
+import { HttpClient } from '@angular/common/http';
+import { Injectable } from '@angular/core';
 
-import { ReplaySubject } from "rxjs";
-import "rxjs/add/operator/map";
+import { ReplaySubject } from 'rxjs/ReplaySubject';
+import 'rxjs/add/operator/map';
 
-import { keyBy, sortBy } from "lodash";
+import { keyBy, sortBy } from 'lodash';
 
-export interface ILanguageInfo {
+export interface LanguageInfo {
   key: string;
   name: string;
   mode: string;
@@ -16,17 +16,17 @@ export interface ILanguageInfo {
 export class LanguagesService {
 
   private languagesInfo = keyBy([
-    { key: "nodejs", name: "NodeJS", mode: "javascript" },
-    { key: "golang", name: "Go(lang)", mode: "golang" },
-  ], "key");
+    { key: 'nodejs', name: 'NodeJS', mode: 'javascript' },
+    { key: 'golang', name: 'Go(lang)', mode: 'golang' },
+  ], 'key');
 
-  private languages$ = new ReplaySubject<ILanguageInfo[]>();
+  private languages$ = new ReplaySubject<LanguageInfo[]>();
 
   constructor(private http: HttpClient) {
-    this.http.get<{languages: string[]}>("/api/languages")
+    this.http.get<{languages: string[]}>('/api/languages')
       .map((res) => res.languages)
       .map((languages) => languages.map(this.getLanguageInfo))
-      .map((languages) => sortBy(languages, "name"))
+      .map((languages) => sortBy(languages, 'name'))
       .subscribe(this.languages$);
   }
 

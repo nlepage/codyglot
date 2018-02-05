@@ -59,8 +59,6 @@
       "spec": false
     },
     "component": {
-      "inlineStyle": true,
-      "inlineTemplate": true,
       "spec": false
     },
     "directive": {

@@ -1,27 +1,27 @@
-import { Component, EventEmitter, Input, Output } from "@angular/core";
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 
 @Component({
-  selector: "stdxxx",
-  styleUrls: ["./stdxxx.component.css"],
-  templateUrl: "./stdxxx.component.html",
+  selector: 'app-stdxxx',
+  styleUrls: ['./stdxxx.component.css'],
+  templateUrl: './stdxxx.component.html',
 })
 export class StdxxxComponent {
 
   @Input()
-  public title: string;
+  title: string;
 
   @Input()
-  public readonly = false;
+  readonly = false;
 
   @Output()
-  public onContentChange = new EventEmitter<string>();
+  contentChange = new EventEmitter<string>();
 
   private _content: string;
 
   @Input()
   set content(content: string) {
     this._content = content;
-    this.onContentChange.emit(content);
+    this.contentChange.emit(content);
   }
 
   get content() { return this._content; }
