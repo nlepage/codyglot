@@ -1,30 +1,31 @@
-import { Component } from '@angular/core';
-import { LanguageInfo } from './languages.service'
-import { ExecuteResult, ExecuteService } from './execute.service'
+import { Component } from "@angular/core";
+
+import { ExecuteService, IExecuteResult } from "./execute.service";
+import { ILanguageInfo } from "./languages.service";
 
 @Component({
-  selector: 'app-root',
-  templateUrl: './app.component.html',
-  styleUrls: ['./app.component.css']
+  selector: "app-root",
+  styleUrls: ["./app.component.css"],
+  templateUrl: "./app.component.html",
 })
 export class AppComponent {
 
-  language: LanguageInfo;
-  source: string;
-  stdin: string;
-  result: ExecuteResult;
-  executing = false;
+  public language: ILanguageInfo;
+  public source: string;
+  public stdin: string;
+  public result: IExecuteResult;
+  public executing = false;
 
   constructor(private executeService: ExecuteService) {
-    this.executeService.result.subscribe(result => {
+    this.executeService.result.subscribe((result) => {
       this.result = result;
       this.executing = false;
     });
   }
 
-  execute = () => {
-    this.executing = true
-    this.result = undefined
+  public execute = () => {
+    this.executing = true;
+    this.result = undefined;
     this.executeService.execute(this.language.key, this.source, this.stdin);
   }
 }

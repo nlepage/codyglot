@@ -1,26 +1,22 @@
-import { Component, OnInit, Input, EventEmitter, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from "@angular/core";
 
 @Component({
-  selector: 'stdxxx',
-  templateUrl: './stdxxx.component.html',
-  styleUrls: ['./stdxxx.component.css']
+  selector: "stdxxx",
+  styleUrls: ["./stdxxx.component.css"],
+  templateUrl: "./stdxxx.component.html",
 })
-export class StdxxxComponent implements OnInit {
+export class StdxxxComponent {
 
   @Input()
-  title: string;
+  public title: string;
 
   @Input()
-  readonly = false;
+  public readonly = false;
+
+  @Output()
+  public onContentChange = new EventEmitter<string>();
 
   private _content: string;
-
-  @Output() onContentChange = new EventEmitter<string>();
-
-  constructor() {}
-
-  ngOnInit() {
-  }
 
   @Input()
   set content(content: string) {

@@ -1,42 +1,45 @@
-import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { ReplaySubject } from 'rxjs';
-import 'rxjs/add/operator/map';
-import { keyBy, sortBy } from 'lodash';
+import { HttpClient } from "@angular/common/http";
+import { Injectable } from "@angular/core";
 
-export type LanguageInfo = {
-  key: string,
-  name: string,
-  mode: string,
+import { ReplaySubject } from "rxjs";
+import "rxjs/add/operator/map";
+
+import { keyBy, sortBy } from "lodash";
+
+export interface ILanguageInfo {
+  key: string;
+  name: string;
+  mode: string;
 }
 
 @Injectable()
 export class LanguagesService {
 
   private languagesInfo = keyBy([
-    { key: 'nodejs', name: 'NodeJS', mode: 'javascript' },
-    { key: 'golang', name: 'Go(lang)', mode: 'golang' },
-  ], 'key')
+    { key: "nodejs", name: "NodeJS", mode: "javascript" },
+    { key: "golang", name: "Go(lang)", mode: "golang" },
+  ], "key");
 
-  private _languages = new ReplaySubject<LanguageInfo[]>()
+  private languages$ = new ReplaySubject<ILanguageInfo[]>();
 
   constructor(private http: HttpClient) {
-    this.http.get<{languages:String[]}>('/api/languages')
-      .map(res => res.languages)
-      .map(languages => languages.map(this.getLanguageInfo))
-      .map(languages => sortBy(languages, 'name'))
-      .subscribe(this._languages);
+    this.http.get<{languages: string[]}>("/api/languages")
+      .map((res) => res.languages)
+      .map((languages) => languages.map(this.getLanguageInfo))
+      .map((languages) => sortBy(languages, "name"))
+      .subscribe(this.languages$);
   }
 
-  getLanguageInfo = (key: string) => {
-    if (this.languagesInfo[key]) return this.languagesInfo[key];
+  public getLanguageInfo = (key: string) => {
+    if (this.languagesInfo[key]) {
+      return this.languagesInfo[key];
+    }
     return {
       key,
-      name: key,
       mode: key,
+      name: key,
     };
   }
 
-  get languages() { return this._languages.asObservable(); }
-
+  get languages() { return this.languages$.asObservable(); }
 }

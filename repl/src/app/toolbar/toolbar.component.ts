@@ -1,42 +1,42 @@
-import { Component, OnInit, Input, EventEmitter, Output } from '@angular/core';
-import { LanguageInfo, LanguagesService } from '../languages.service';
-import { get } from 'lodash';
+import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
+import { get } from "lodash";
+import { ILanguageInfo, LanguagesService } from "../languages.service";
 
 @Component({
-  selector: 'toolbar',
-  templateUrl: './toolbar.component.html',
-  styleUrls: ['./toolbar.component.css']
+  selector: "toolbar",
+  styleUrls: ["./toolbar.component.css"],
+  templateUrl: "./toolbar.component.html",
 })
 export class ToolbarComponent implements OnInit {
 
-  languages: LanguageInfo[];
+  public languages: ILanguageInfo[];
 
-  private _language: LanguageInfo;
+  @Output() public onSelectLanguage = new EventEmitter<ILanguageInfo>();
 
-  @Output() onSelectLanguage = new EventEmitter<LanguageInfo>();
+  @Output() public onRun = new EventEmitter<void>();
 
-  @Output() onRun = new EventEmitter<void>();
+  @Input() public executing: boolean;
 
-  @Input() executing: boolean;
+  @Input() public compilationTime: string;
 
-  @Input() compilationTime: string;
+  @Input() public runningTime: string;
 
-  @Input() runningTime: string;
+  private _language: ILanguageInfo;
 
   constructor(private languagesService: LanguagesService) {}
 
-  ngOnInit() {
-    this.languagesService.languages.subscribe(languages => {
+  public ngOnInit() {
+    this.languagesService.languages.subscribe((languages) => {
       this.languages = languages;
       this.language = languages[0].key;
     });
   }
 
-  get language() { return get(this._language, 'key'); }
+  get language() { return get(this._language, "key"); }
   set language(key: string) {
-    this._language = this.languages.find(language => language.key === key);
+    this._language = this.languages.find((language) => language.key === key);
     this.onSelectLanguage.emit(this._language);
   }
 
-  run = () => this.onRun.emit();
+  public run = () => this.onRun.emit();
 }

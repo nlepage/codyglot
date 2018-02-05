@@ -1,29 +1,30 @@
-import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Subject } from 'rxjs';
+import { HttpClient } from "@angular/common/http";
+import { Injectable } from "@angular/core";
 
-export type ExecuteResult = {
-  stdout: string,
-  stderr: string,
-  compilationTime: string,
-  runningTime: string,
+import { Subject } from "rxjs";
+
+export interface IExecuteResult {
+  stdout: string;
+  stderr: string;
+  compilationTime: string;
+  runningTime: string;
 }
 
 @Injectable()
 export class ExecuteService {
 
-  private _result = new Subject<ExecuteResult>();
+  private result$ = new Subject<IExecuteResult>();
 
   constructor(private http: HttpClient) {}
 
-  execute = (language: string, source: string, stdin: string): void => {
-    this.http.post<ExecuteResult>('/api/execute', { language, source, stdin })
+  public execute = (language: string, source: string, stdin: string): void => {
+    this.http.post<IExecuteResult>("/api/execute", { language, source, stdin })
       .subscribe({
-        next: result => this._result.next(result),
-        error: e => this._result.error(e),
+        error: (e) => this.result$.error(e),
+        next: (result) => this.result$.next(result),
       });
   }
 
-  get result() { return this._result.asObservable() }
+  get result() { return this.result$.asObservable(); }
 
 }
