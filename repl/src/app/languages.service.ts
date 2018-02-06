@@ -16,8 +16,9 @@ export interface LanguageInfo {
 export class LanguagesService {
 
   private languagesInfo = keyBy([
-    { key: 'javascript', name: 'JavaScript', mode: 'javascript' },
     { key: 'golang', name: 'Go(lang)', mode: 'golang' },
+    { key: 'javascript', name: 'JavaScript', mode: 'javascript' },
+    { key: 'typescript', name: 'TypeScript', mode: 'typescript' },
   ], 'key');
 
   private languages$ = new ReplaySubject<LanguageInfo[]>();

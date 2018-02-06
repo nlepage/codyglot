@@ -5,6 +5,7 @@ import { LanguageInfo } from '../languages.service';
 import 'brace';
 import 'brace/mode/golang';
 import 'brace/mode/javascript';
+import 'brace/mode/typescript';
 import 'brace/theme/chrome';
 
 @Component({

@@ -10,13 +10,28 @@ import (
 	"github.com/pkg/errors"
 )
 
+const (
+	javascript = "javascript"
+	typescript = "typescript"
+)
+
 // Executor returns NodeJS Executor
 func Executor() *executor.Executor {
-	return executor.New(execute, []string{"javascript"})
+	return executor.New(execute, []string{javascript, typescript})
 }
 
-// Execute executes NodeJS code
 func execute(ctx context.Context, req *service.ExecuteRequest) (*service.ExecuteResponse, error) {
+	switch req.Language {
+	case javascript:
+		return executeJavascript(ctx, req)
+	case typescript:
+		return executeTypescript(ctx, req)
+	default:
+		return nil, errors.Errorf("execute: Unsupported language %s", req.Language)
+	}
+}
+
+func executeJavascript(ctx context.Context, req *service.ExecuteRequest) (*service.ExecuteResponse, error) {
 	tmpDir, err := tmputil.NewTmpDir()
 	if err != nil {
 		return nil, err
@@ -38,6 +53,47 @@ func execute(ctx context.Context, req *service.ExecuteRequest) (*service.Execute
 		ExitStatus:  cmd.ExitStatus(),
 		Stdout:      cmd.Stdout(),
 		Stderr:      cmd.Stderr(),
-		RunningTime: int64(cmd.Duration()),
+		RunningTime: cmd.Duration(),
+	}, nil
+}
+
+func executeTypescript(ctx context.Context, req *service.ExecuteRequest) (*service.ExecuteResponse, error) {
+	tmpDir, err := tmputil.NewTmpDir()
+	if err != nil {
+		return nil, err
+	}
+	defer tmpDir.Close()
+
+	srcFile, err := tmpDir.WriteFile("index.ts", req.Source)
+	if err != nil {
+		return nil, err
+	}
+
+	compileCmd := executil.Command(ctx, "tsc", srcFile)
+
+	if err = compileCmd.Run(); err != nil {
+		return nil, errors.Wrap(err, "execute: Compile command failed")
+	}
+
+	if compileCmd.ExitStatus() != 0 {
+		return &service.ExecuteResponse{
+			ExitStatus: compileCmd.ExitStatus(),
+			Stdout:     compileCmd.Stdout(),
+			Stderr:     compileCmd.Stderr(),
+		}, nil
+	}
+
+	runCmd := executil.Command(ctx, "node", tmpDir.Join("index.js")).WithStdin(req.Stdin)
+
+	if err = runCmd.Run(); err != nil {
+		return nil, errors.Wrap(err, "execute: Run command failed")
+	}
+
+	return &service.ExecuteResponse{
+		ExitStatus:      runCmd.ExitStatus(),
+		Stdout:          runCmd.Stdout(),
+		Stderr:          runCmd.Stderr(),
+		CompilationTime: compileCmd.Duration(),
+		RunningTime:     runCmd.Duration(),
 	}, nil
 }

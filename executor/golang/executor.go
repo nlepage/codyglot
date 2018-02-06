@@ -10,13 +10,21 @@ import (
 	"github.com/pkg/errors"
 )
 
+const (
+	golang = "golang"
+)
+
 // Executor returns Golang Executor
 func Executor() *executor.Executor {
-	return executor.New(execute, []string{"golang"})
+	return executor.New(execute, []string{golang})
 }
 
 // Execute executes Go(lang) code
 func execute(ctx context.Context, req *service.ExecuteRequest) (*service.ExecuteResponse, error) {
+	if req.Language != golang {
+		return nil, errors.Errorf("execute: Unsupported language %s", req.Language)
+	}
+
 	tmpDir, err := tmputil.NewTmpDir()
 	if err != nil {
 		return nil, err
@@ -54,7 +62,7 @@ func execute(ctx context.Context, req *service.ExecuteRequest) (*service.Execute
 		ExitStatus:      runCmd.ExitStatus(),
 		Stdout:          runCmd.Stdout(),
 		Stderr:          runCmd.Stderr(),
-		CompilationTime: int64(buildCmd.Duration()),
-		RunningTime:     int64(runCmd.Duration()),
+		CompilationTime: buildCmd.Duration(),
+		RunningTime:     runCmd.Duration(),
 	}, nil
 }

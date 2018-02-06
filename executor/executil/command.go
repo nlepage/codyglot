@@ -86,10 +86,10 @@ func (cmd *Cmd) Stderr() string {
 	return string(cmd.stderr.Bytes())
 }
 
-func (cmd *Cmd) Duration() time.Duration {
+func (cmd *Cmd) Duration() int64 {
 	cmd.checkErrors("Duration")
 
-	return cmd.duration
+	return int64(cmd.duration)
 }
 
 func (cmd *Cmd) writeStdin() {

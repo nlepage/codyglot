@@ -62,21 +62,12 @@ func (s *Server) Execute(ctx context.Context, req *service.ExecuteRequest) (*ser
 
 	client := service.NewCodyglotClient(conn)
 
-	res, err := client.Execute(ctx, &service.ExecuteRequest{
-		Source: req.Source,
-		Stdin:  req.Stdin,
-	})
+	res, err := client.Execute(ctx, req)
 	if err != nil {
 		return nil, errors.Wrap(err, "Router: an error occured while calling executor")
 	}
 
-	return &service.ExecuteResponse{
-		ExitStatus:      res.ExitStatus,
-		Stderr:          res.Stderr,
-		Stdout:          res.Stdout,
-		CompilationTime: res.CompilationTime,
-		RunningTime:     res.RunningTime,
-	}, nil
+	return res, nil
 }
 
 // Languages lists languages for which an executor is available
