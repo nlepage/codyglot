@@ -9,15 +9,14 @@ import (
 	executor_config "github.com/nlepage/codyglot/executor/config"
 	"github.com/nlepage/codyglot/router/server/config"
 	"github.com/nlepage/codyglot/service"
-	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
 )
 
 type executor struct {
-	host      string
-	port      string
+	hostport  string
 	alive     bool
+	aliveCh   chan bool
 	backoff   time.Duration
 	languages []string
 }
@@ -36,85 +35,107 @@ func initExecutorsStatic() error {
 		}
 
 		executors = append(executors, &executor{
-			host: host,
-			port: port,
+			hostport: net.JoinHostPort(host, port),
+			aliveCh:  make(chan bool),
 		})
 	}
 
 	return nil
 }
 
-func startPinging() {
+func startExecutors() {
 	for _, exec := range executors {
-		go func(exec *executor) {
-			for {
-				if exec.alive {
-					time.Sleep(config.PingInterval)
-				} else {
-					time.Sleep(exec.backoff * 100 * time.Millisecond)
-				}
-
-				if alive := pingExecutor(exec); alive {
-					if !exec.alive {
-						exec.alive = true
-						log.Infof("Executor %s is alive", exec.host)
-						// FIXME send on chan
-					}
-					if exec.backoff != 0 {
-						exec.backoff = 0
-					}
-				} else {
-					if exec.alive {
-						exec.alive = false
-						log.Infof("Executor %s is dead", exec.host)
-						// FIXME send on chan
-					}
-					if exec.backoff == 0 {
-						exec.backoff = 1
-					} else if exec.backoff*100 < config.MaxBackoff {
-						exec.backoff <<= 1
-					}
-				}
-
-			}
-		}(exec)
+		go exec.runPing()
 	}
 }
 
-func pingExecutor(exec *executor) bool {
+func (exec *executor) runPing() {
+	for {
+		if exec.alive {
+			time.Sleep(config.PingInterval)
+		} else {
+			time.Sleep(exec.backoff * 100 * time.Millisecond)
+		}
+
+		if alive := exec.ping(); alive {
+			if !exec.alive {
+				exec.alive = true
+				log.Infof("Executor %s is alive", exec.hostport)
+				exec.aliveCh <- true
+			}
+
+			if exec.backoff != 0 {
+				exec.backoff = 0
+			}
+		} else {
+			if exec.alive {
+				exec.alive = false
+				log.Infof("Executor %s is dead", exec.hostport)
+				exec.aliveCh <- false
+			}
+
+			if exec.backoff == 0 {
+				exec.backoff = 1
+			} else if exec.backoff*100 < config.MaxBackoff {
+				exec.backoff <<= 1
+			}
+		}
+	}
+}
+
+func (exec *executor) ping() bool {
 	opts := []grpc.DialOption{grpc.WithInsecure()}
-	conn, err := grpc.Dial(net.JoinHostPort(exec.host, exec.port), opts...)
+	conn, err := grpc.Dial(exec.hostport, opts...)
 	if err != nil {
 		log.WithError(err).Error("Router: could not create executor dial context")
 		return false
 	}
 	defer conn.Close()
 
-	client := service.NewCodyglotClient(conn)
-
-	_, err = client.Ping(context.Background(), &service.Ping{})
+	_, err = service.NewCodyglotClient(conn).Ping(context.Background(), &service.Ping{})
 	if err != nil {
-		log.WithError(err).Errorf("Router: an error occured while pinging executor %s", exec.host)
+		log.WithError(err).Errorf("Router: an error occured while pinging executor %s", exec.hostport)
 		return false
 	}
 
 	return true
 }
 
-func getExecutorLanguages(executor string) ([]string, error) {
+func (exec *executor) runRefreshLanguages() {
+	for {
+		select {
+		case alive := <-exec.aliveCh:
+			if alive {
+				exec.refreshLanguages()
+			} else {
+
+			}
+		case <-time.After(time.Minute):
+			// FIXME put a rwlock on alive ? on exec ?
+			if exec.alive {
+				exec.refreshLanguages()
+			}
+		}
+	}
+}
+
+func (exec *executor) refreshLanguages() {
 	opts := []grpc.DialOption{grpc.WithInsecure()}
-	conn, err := grpc.Dial(executor, opts...)
+	conn, err := grpc.Dial(exec.hostport, opts...)
 	if err != nil {
-		return nil, errors.Wrap(err, "Router: could not create executor dial context")
+		log.WithError(err).Error("Router: could not create executor dial context")
+		return
 	}
 	defer conn.Close()
 
-	client := service.NewCodyglotClient(conn)
-
-	res, err := client.Languages(context.Background(), &service.LanguagesRequest{})
+	res, err := service.NewCodyglotClient(conn).Languages(context.Background(), &service.LanguagesRequest{})
 	if err != nil {
-		return nil, errors.Wrap(err, "Router: an error occured while calling executor")
+		log.WithError(err).Error("Router: an error occured while calling executor")
+		return
 	}
 
-	return res.Languages, nil
+	// FIXME put a rwlock on languages
+	exec.languages = res.Languages
+
+	// FIXME send notif to refresh executor map
 }

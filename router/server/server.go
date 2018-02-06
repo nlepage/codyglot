@@ -12,13 +12,12 @@ import (
 	"google.golang.org/grpc"
 )
 
+// Init initializes the router server (parses CLI args and starts background tasks)
 func Init() error {
 	if err := initExecutorsStatic(); err != nil {
 		return err
 	}
-
-	startPinging()
-
+	startExecutors()
 	return nil
 }
 
@@ -27,6 +26,7 @@ type Server struct {
 	*ping.Server
 }
 
+// New returns a pointer on a new Server
 func New() *Server {
 	return &Server{&ping.Server{}}
 }
@@ -70,7 +70,9 @@ func (s *Server) Execute(ctx context.Context, req *service.ExecuteRequest) (*ser
 
 // Languages lists languages for which an executor is available
 func (s *Server) Languages(ctx context.Context, req *service.LanguagesRequest) (*service.LanguagesResponse, error) {
-	return &service.LanguagesResponse{nil}, nil
+	return &service.LanguagesResponse{
+		Languages: nil,
+	}, nil
 }
 
 var _ service.CodyglotServer = (*Server)(nil)
