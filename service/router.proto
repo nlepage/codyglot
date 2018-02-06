@@ -18,6 +18,8 @@ service Codyglot {
       get: "/languages"
     };
   }
+
+  rpc ping(Ping) returns (Pong) {}
 }
 
 message ExecuteRequest {
@@ -34,9 +36,11 @@ message ExecuteResponse {
   int64 runningTime = 5; // Running time
 }
 
-message LanguagesRequest {
-}
+message LanguagesRequest {}
 
 message LanguagesResponse {
   repeated string languages = 1; // Available languages
 }
+
+message Ping {}
+message Pong {}

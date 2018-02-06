@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net"
 
+	"github.com/nlepage/codyglot/ping"
 	"github.com/nlepage/codyglot/router/server/config"
 	"github.com/nlepage/codyglot/service"
 	"github.com/pkg/errors"
@@ -15,12 +16,18 @@ var (
 	languages map[string]string
 )
 
-// Server is Codyglot router gRPC server
-type Server struct{}
-
 // Init initializes the router server
 func Init() error {
 	return initLanguages()
+}
+
+// Server is Codyglot router gRPC server
+type Server struct {
+	*ping.Server
+}
+
+func New() *Server {
+	return &Server{&ping.Server{}}
 }
 
 // Serve starts listening for gRPC requests

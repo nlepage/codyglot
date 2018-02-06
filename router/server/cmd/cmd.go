@@ -14,7 +14,7 @@ var _cmd = &cobra.Command{
 		return server.Init()
 	},
 	RunE: func(_ *cobra.Command, _ []string) error {
-		return (&server.Server{}).Serve()
+		return server.New().Serve()
 	},
 }
 
