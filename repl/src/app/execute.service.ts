@@ -17,7 +17,7 @@ export class ExecuteService {
 
   constructor(private http: HttpClient) {}
 
-  execute = (language: string, source: string, stdin: string): void => {
+  execute(language: string, source: string, stdin: string): void {
     this.http.post<ExecuteResult>('/api/execute', { language, source, stdin })
       .subscribe({
         error: (e) => this.result$.error(e),

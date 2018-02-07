@@ -1,7 +1,6 @@
 import { Component } from '@angular/core';
 
 import { ExecuteService, ExecuteResult } from './execute.service';
-import { LanguageInfo } from './languages.service';
 
 @Component({
   selector: 'app-root',
@@ -10,7 +9,6 @@ import { LanguageInfo } from './languages.service';
 })
 export class AppComponent {
 
-  language: LanguageInfo;
   source: string;
   stdin: string;
   result: ExecuteResult;
@@ -23,9 +21,9 @@ export class AppComponent {
     });
   }
 
-  execute = () => {
+  execute = ({ language }: { language: string }) => {
     this.executing = true;
     this.result = undefined;
-    this.executeService.execute(this.language.key, this.source, this.stdin);
+    this.executeService.execute(language, this.source, this.stdin);
   }
 }
