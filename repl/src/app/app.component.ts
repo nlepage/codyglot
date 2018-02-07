@@ -11,19 +11,12 @@ export class AppComponent {
 
   source: string;
   stdin: string;
-  result: ExecuteResult;
-  executing = false;
 
-  constructor(private executeService: ExecuteService) {
-    this.executeService.result.subscribe((result) => {
-      this.result = result;
-      this.executing = false;
-    });
-  }
+  constructor(private executeService: ExecuteService) {}
 
   execute = ({ language }: { language: string }) => {
-    this.executing = true;
-    this.result = undefined;
     this.executeService.execute(language, this.source, this.stdin);
   }
+
+  get result() { return this.executeService.result; }
 }

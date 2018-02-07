@@ -1,5 +1,6 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Output } from '@angular/core';
 import { get } from 'lodash';
+import { ExecuteService } from '../execute.service';
 import { LanguageInfo, LanguagesService } from '../languages.service';
 
 @Component({
@@ -11,18 +12,16 @@ export class ToolbarComponent {
 
   @Output() run = new EventEmitter<{language: string}>();
 
-  @Input() executing: boolean;
+  constructor(private languagesService: LanguagesService, private executeService: ExecuteService) {}
 
-  @Input() compilationTime: string;
-
-  @Input() runningTime: string;
-
-  constructor(private languagesService: LanguagesService) {}
+  runClick = () => this.run.emit({ language: this.language });
 
   get language() { return this.languagesService.language; }
   set language(key: string) { this.languagesService.language = key; }
 
   get languages() { return this.languagesService.languages; }
 
-  runClick = () => this.run.emit({ language: this.language });
+  get result() { return this.executeService.result; }
+
+  get executing() { return this.executeService.executing; }
 }

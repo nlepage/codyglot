@@ -1,10 +1,5 @@
 <div class="grid">
-  <app-toolbar
-    (run)="execute($event)"
-    [compilationTime]="result?.compilationTime"
-    [runningTime]="result?.runningTime"
-    [executing]="executing"
-  ></app-toolbar>
+  <app-toolbar (run)="execute($event)"></app-toolbar>
   <app-source (sourceChange)="source = $event"></app-source>
   <app-stdxxx class="stdin" title="Standard input" (contentChange)="stdin = $event"></app-stdxxx>
   <app-stdxxx class="stdout" title="Standard output" [readonly]="true" [content]="result?.stdout"></app-stdxxx>

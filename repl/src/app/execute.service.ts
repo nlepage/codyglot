@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 
-import { Subject } from 'rxjs/Subject';
+import 'rxjs/add/operator/finally';
 
 export interface ExecuteResult {
   stdout: string;
@@ -13,18 +13,19 @@ export interface ExecuteResult {
 @Injectable()
 export class ExecuteService {
 
-  private result$ = new Subject<ExecuteResult>();
+  result: ExecuteResult;
+  executing = false;
 
   constructor(private http: HttpClient) {}
 
   execute(language: string, source: string, stdin: string): void {
+    this.result = undefined;
+    this.executing = true;
     this.http.post<ExecuteResult>('/api/execute', { language, source, stdin })
+      .finally(() => this.executing = false)
       .subscribe({
-        error: (e) => this.result$.error(e),
-        next: (result) => this.result$.next(result),
+        error: (e) => console.error(e), // FIXME do something useful
+        next: (result) => this.result = result,
       });
   }
-
-  get result() { return this.result$.asObservable(); }
-
 }

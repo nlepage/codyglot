@@ -26,7 +26,7 @@ export class LanguagesService {
 
   constructor(private http: HttpClient) {
     this.http.get<{languages: string[]}>('/api/languages')
-      .map((res) => res.languages || new Array<string>())
+      .map((res) => res.languages || new Array<string>('golang'))
       .map((languages) => languages.map(this.getLanguageInfo))
       .map((languages) => sortBy(languages, 'name'))
       .subscribe((languages) => {
