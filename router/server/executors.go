@@ -108,7 +108,8 @@ func (exec *executor) runRefreshLanguages() {
 			if alive {
 				exec.refreshLanguages()
 			} else {
-
+				//FIXME lock languages
+				exec.languages = nil
 			}
 		case <-time.After(time.Minute):
 			// FIXME put a rwlock on alive ? on exec ?
