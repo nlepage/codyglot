@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 
-import { LanguageInfo } from '../languages.service';
+import { LanguagesService } from '../languages.service';
 
 import 'brace';
 import 'brace/mode/golang';
@@ -15,19 +15,18 @@ import 'brace/theme/chrome';
 })
 export class SourceComponent {
 
-  @Input()
-  language: LanguageInfo;
-
   @Output()
   sourceChange = new EventEmitter<string>();
 
   private _source: string;
 
+  constructor(private languagesService: LanguagesService) {}
+
+  get source() { return this._source; }
   set source(source: string) {
     this._source = source;
     this.sourceChange.emit(source);
   }
 
-  get source() { return this._source; }
-
+  get language() { return this.languagesService.languageInfo; }
 }

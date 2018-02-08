@@ -10,6 +10,6 @@
     <app-loading *ngIf="executing"></app-loading>
     Run
   </button>
-  <div class="time" *ngIf="compilationTime">Compiled in {{compilationTime / 1000000 | number:'1.0-2'}}ms</div>
-  <div class="time" *ngIf="runningTime">Ran in {{runningTime / 1000000 | number:'1.0-2'}}ms</div>
+  <div class="time" *ngIf="result?.compilationTime">Compiled in {{result.compilationTime / 1000000 | number:'1.0-2'}}ms</div>
+  <div class="time" *ngIf="result?.runningTime">Ran in {{result.runningTime / 1000000 | number:'1.0-2'}}ms</div>
 </div>

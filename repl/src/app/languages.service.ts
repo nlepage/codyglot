@@ -21,17 +21,25 @@ export class LanguagesService {
     { key: 'typescript', name: 'TypeScript', mode: 'typescript' },
   ], 'key');
 
-  private languages$ = new ReplaySubject<LanguageInfo[]>();
+  languages = new Array<LanguageInfo>();
+  language: string;
 
   constructor(private http: HttpClient) {
     this.http.get<{languages: string[]}>('/api/languages')
-      .map((res) => res.languages)
+      .map((res) => res.languages || new Array<string>('golang'))
       .map((languages) => languages.map(this.getLanguageInfo))
       .map((languages) => sortBy(languages, 'name'))
-      .subscribe(this.languages$);
+      .subscribe((languages) => {
+        this.languages = languages;
+        if (languages.length) {
+          this.language = languages[0].key;
+        }
+      });
   }
 
-  public getLanguageInfo = (key: string) => {
+  get languageInfo() { return this.getLanguageInfo(this.language); }
+
+  private getLanguageInfo = (key: string): LanguageInfo => {
     if (this.languagesInfo[key]) {
       return this.languagesInfo[key];
     }
@@ -41,6 +49,4 @@ export class LanguagesService {
       name: key,
     };
   }
-
-  get languages() { return this.languages$.asObservable(); }
 }

@@ -1,12 +1,6 @@
 <div class="grid">
-  <app-toolbar
-    (selectLanguage)="language = $event"
-    (run)="execute()"
-    [compilationTime]="result?.compilationTime"
-    [runningTime]="result?.runningTime"
-    [executing]="executing"
-  ></app-toolbar>
-  <app-source [language]="language" (sourceChange)="source = $event"></app-source>
+  <app-toolbar (run)="execute($event)"></app-toolbar>
+  <app-source (sourceChange)="source = $event"></app-source>
   <app-stdxxx class="stdin" title="Standard input" (contentChange)="stdin = $event"></app-stdxxx>
   <app-stdxxx class="stdout" title="Standard output" [readonly]="true" [content]="result?.stdout"></app-stdxxx>
   <app-stdxxx class="stderr" title="Standard error" [readonly]="true" [content]="result?.stderr"></app-stdxxx>

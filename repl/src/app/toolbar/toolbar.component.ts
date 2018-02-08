@@ -1,5 +1,6 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Output } from '@angular/core';
 import { get } from 'lodash';
+import { ExecuteService } from '../execute.service';
 import { LanguageInfo, LanguagesService } from '../languages.service';
 
 @Component({
@@ -7,36 +8,20 @@ import { LanguageInfo, LanguagesService } from '../languages.service';
   styleUrls: ['./toolbar.component.css'],
   templateUrl: './toolbar.component.html',
 })
-export class ToolbarComponent implements OnInit {
+export class ToolbarComponent {
 
-  languages: LanguageInfo[];
+  @Output() run = new EventEmitter<{language: string}>();
 
-  @Output() selectLanguage = new EventEmitter<LanguageInfo>();
+  constructor(private languagesService: LanguagesService, private executeService: ExecuteService) {}
 
-  @Output() run = new EventEmitter<void>();
+  runClick = () => this.run.emit({ language: this.language });
 
-  @Input() executing: boolean;
+  get language() { return this.languagesService.language; }
+  set language(key: string) { this.languagesService.language = key; }
 
-  @Input() compilationTime: string;
+  get languages() { return this.languagesService.languages; }
 
-  @Input() runningTime: string;
+  get result() { return this.executeService.result; }
 
-  private _language: LanguageInfo;
-
-  constructor(private languagesService: LanguagesService) {}
-
-  ngOnInit() {
-    this.languagesService.languages.subscribe((languages) => {
-      this.languages = languages;
-      this.language = languages[0].key;
-    });
-  }
-
-  get language() { return get(this._language, 'key'); }
-  set language(key: string) {
-    this._language = this.languages.find((language) => language.key === key);
-    this.selectLanguage.emit(this._language);
-  }
-
-  runClick = () => this.run.emit();
+  get executing() { return this.executeService.executing; }
 }
