@@ -10,8 +10,8 @@ import (
 var _cmd = &cobra.Command{
 	Use:   "server",
 	Short: "Start Codyglot router gRPC server",
-	PersistentPreRunE: func(_ *cobra.Command, _ []string) error {
-		return server.Init()
+	PersistentPreRun: func(_ *cobra.Command, _ []string) {
+		server.Init()
 	},
 	RunE: func(_ *cobra.Command, _ []string) error {
 		return server.New().Serve()
