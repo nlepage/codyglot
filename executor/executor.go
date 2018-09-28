@@ -38,7 +38,7 @@ func (e *Executor) Execute(ctx context.Context, req *service.ExecuteRequest) (*s
 
 // Languages lists languages supported by the executor
 func (e *Executor) Languages(ctx context.Context, req *service.LanguagesRequest) (*service.LanguagesResponse, error) {
-	return &service.LanguagesResponse{e.languages}, nil
+	return &service.LanguagesResponse{Languages: e.languages}, nil
 }
 
 var _ service.CodyglotServer = (*Executor)(nil)
