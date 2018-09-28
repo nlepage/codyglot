@@ -3,11 +3,13 @@ version: "3"
 services:
 
   repl:
+    build: repl
     image: nlepage/codyglot:repl
     ports:
       - "80"
 
   gateway:
+    build: .
     image: nlepage/codyglot:base
     read_only: true
     command: ["router", "gateway", "-e", "router:9090"]
@@ -15,6 +17,7 @@ services:
       - "8080"
 
   router:
+    build: .
     image: nlepage/codyglot:base
     read_only: true
     command: ["router", "server"]
@@ -22,6 +25,7 @@ services:
       - "9090"
 
   golang:
+    build: executor/golang
     image: nlepage/codyglot:golang
     read_only: true
     tmpfs:
@@ -30,6 +34,7 @@ services:
       - "9090"
 
   nodejs:
+    build: executor/nodejs
     image: nlepage/codyglot:nodejs
     read_only: true
     tmpfs:

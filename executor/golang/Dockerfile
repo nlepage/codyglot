@@ -1,6 +1,6 @@
 FROM nlepage/codyglot:base as origin
 
-FROM golang:1.9-alpine
+FROM golang:1.11
 
 COPY --from=origin /usr/local/bin/codyglot /usr/local/bin/codyglot
 

@@ -1,4 +1,4 @@
-FROM node:9-alpine AS builder
+FROM node:10 AS builder
 
 WORKDIR /home/node/app
 COPY package.json yarn.lock ./
@@ -6,7 +6,7 @@ RUN yarn --pure-lockfile
 COPY . .
 RUN yarn build
 
-FROM nginx:1-alpine
+FROM nginx:1
 
 COPY --from=builder /home/node/app/dist /usr/share/nginx/html
 COPY default.conf.template /etc/nginx/conf.d/

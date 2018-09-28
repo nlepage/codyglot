@@ -1,6 +1,6 @@
-FROM golang:1.11-alpine as builder
+FROM golang:1.11 as builder
 
-RUN apk update && apk add git build-base protobuf protobuf-dev &&\
+RUN apt-get update && apt-get install -y --no-install-recommends protobuf-compiler libprotobuf-dev &&\
     go get -v google.golang.org/grpc &&\
     go get -v github.com/golang/protobuf/protoc-gen-go &&\
     go get -v github.com/grpc-ecosystem/grpc-gateway/protoc-gen-grpc-gateway &&\
@@ -19,7 +19,7 @@ RUN protoc -I. \
            service/router.proto &&\
     go install
 
-FROM alpine:3.8
+FROM debian:stretch
 
 COPY --from=builder /go/bin/codyglot /usr/local/bin
 
