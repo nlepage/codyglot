@@ -1,0 +1,34 @@
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: golang
+spec:
+  template:
+    metadata:
+      labels:
+        app: codyglot
+        tier: backend
+    spec:
+      containers:
+        - image: nlepage/codyglot:golang
+          name: golang
+          securityContext:
+            readOnlyRootFilesystem: true
+          volumeMounts:
+          - mountPath: /tmp
+            name: tmp
+      volumes:
+      - name: tmp
+        emptyDir:
+          medium: Memory
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: golang
+spec:
+  selector:
+    app: codyglot
+    tier: backend
+  ports:
+    - port: 9090

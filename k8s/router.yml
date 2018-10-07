@@ -1,0 +1,28 @@
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: router
+spec:
+  template:
+    metadata:
+      labels:
+        app: codyglot
+        tier: backend
+    spec:
+      containers:
+        - image: nlepage/codyglot:base
+          name: router
+          command: ["codyglot", "router", "server"]
+          securityContext:
+            readOnlyRootFilesystem: true
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: router
+spec:
+  selector:
+    app: codyglot
+    tier: backend
+  ports:
+    - port: 9090
