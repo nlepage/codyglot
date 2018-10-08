@@ -1,0 +1,28 @@
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: gateway
+spec:
+  template:
+    metadata:
+      labels:
+        app: codyglot
+        tier: frontend
+    spec:
+      containers:
+        - image: nlepage/codyglot:base
+          name: gateway
+          command: ["codyglot", "router", "gateway", "-e", "router:9090"]
+          securityContext:
+            readOnlyRootFilesystem: true
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: gateway
+spec:
+  selector:
+    app: codyglot
+    tier: frontend
+  ports:
+    - port: 8080
