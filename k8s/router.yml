@@ -7,7 +7,7 @@ spec:
     metadata:
       labels:
         app: codyglot
-        tier: backend
+        service: router
     spec:
       containers:
         - image: nlepage/codyglot:base
@@ -23,6 +23,6 @@ metadata:
 spec:
   selector:
     app: codyglot
-    tier: backend
+    service: router
   ports:
     - port: 9090

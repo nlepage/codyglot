@@ -7,7 +7,8 @@ spec:
     metadata:
       labels:
         app: codyglot
-        tier: backend
+        service: executor
+        language: golang
     spec:
       containers:
         - image: nlepage/codyglot:golang
@@ -29,6 +30,7 @@ metadata:
 spec:
   selector:
     app: codyglot
-    tier: backend
+    service: executor
+    language: golang
   ports:
     - port: 9090

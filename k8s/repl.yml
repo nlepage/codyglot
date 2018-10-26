@@ -7,7 +7,7 @@ spec:
     metadata:
       labels:
         app: codyglot
-        tier: frontend
+        service: repl
     spec:
       containers:
         - image: nlepage/codyglot:repl
@@ -20,7 +20,7 @@ metadata:
 spec:
   selector:
     app: codyglot
-    tier: frontend
+    service: repl
   ports:
     - port: 80
       targetPort: 80
