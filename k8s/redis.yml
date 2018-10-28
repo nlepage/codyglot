@@ -1,26 +1,25 @@
 apiVersion: apps/v1beta1
 kind: Deployment
 metadata:
-  name: repl
+  name: redis
 spec:
   template:
     metadata:
       labels:
         app: codyglot
-        service: repl
+        service: redis
     spec:
       containers:
-        - image: nlepage/codyglot:repl
-          name: repl
+        - image: redis
+          name: redis
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: repl
+  name: redis
 spec:
   selector:
     app: codyglot
-    service: repl
+    service: redis
   ports:
-    - port: 80
-  type: NodePort
+    - port: 6379
