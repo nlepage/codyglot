@@ -31,11 +31,8 @@ func execute(ctx context.Context, req *service.ExecuteRequest) (*service.Execute
 	}
 	defer tmpDir.Close()
 
-	for _, srcFile := range req.Sources {
-		if _, err := tmpDir.WriteFile(srcFile.Path, srcFile.Content); err != nil {
-			// FIXME format error with file information
-			return nil, errors.Wrap(err, "execute: Failed to write source file")
-		}
+	if err = tmpDir.WriteSources(req.Sources); err != nil {
+		return nil, err
 	}
 
 	binFile := tmpDir.Join("main")

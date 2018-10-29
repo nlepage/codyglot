@@ -31,6 +31,8 @@ func execute(ctx context.Context, req *service.ExecuteRequest) (*service.Execute
 	}
 }
 
+// FIXME wrap errors
+
 func executeJavascript(ctx context.Context, req *service.ExecuteRequest) (*service.ExecuteResponse, error) {
 	tmpDir, err := tmputil.NewTmpDir()
 	if err != nil {
@@ -38,10 +40,8 @@ func executeJavascript(ctx context.Context, req *service.ExecuteRequest) (*servi
 	}
 	defer tmpDir.Close()
 
-	for _, srcFile := range req.Sources {
-		if _, err := tmpDir.WriteFile(srcFile.Path, srcFile.Content); err != nil {
-			return nil, err
-		}
+	if err = tmpDir.WriteSources(req.Sources); err != nil {
+		return nil, err
 	}
 
 	cmd := executil.Command(ctx, "node", tmpDir.Path()).WithStdin(req.Stdin)
@@ -65,10 +65,8 @@ func executeTypescript(ctx context.Context, req *service.ExecuteRequest) (*servi
 	}
 	defer tmpDir.Close()
 
-	for _, srcFile := range req.Sources {
-		if _, err := tmpDir.WriteFile(srcFile.Path, srcFile.Content);err != nil {
-			return nil, err
-		}
+	if err = tmpDir.WriteSources(req.Sources); err != nil {
+		return nil, err
 	}
 
 	initCmd := executil.Command(ctx, "tsc", "--init").WithDir(tmpDir.Path())

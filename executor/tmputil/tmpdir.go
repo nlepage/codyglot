@@ -5,8 +5,10 @@ import (
 	"io/ioutil"
 	"os"
 	"path"
+	"path/filepath"
 
 	"github.com/nlepage/codyglot/executor/config"
+	"github.com/nlepage/codyglot/service"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 )
@@ -99,4 +101,20 @@ func (td *TmpDir) Close() {
 // Path returns the path of the TmpDir
 func (td *TmpDir) Path() string {
 	return td.path
+}
+
+// WriteSources writes source files to the TmpDir
+func (td *TmpDir) WriteSources(sources []*service.SourceFile) error {
+	for _, srcFile := range sources {
+		if err := os.MkdirAll(filepath.Dir(td.Join(srcFile.Path)), 0755); err != nil {
+			return errors.Wrap(err, "execute: Failed to create directory")
+		}
+
+		if _, err := td.WriteFile(srcFile.Path, srcFile.Content); err != nil {
+			// FIXME format error with file information
+			return errors.Wrap(err, "execute: Failed to write source file")
+		}
+	}
+
+	return nil
 }
