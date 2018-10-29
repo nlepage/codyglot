@@ -38,12 +38,13 @@ func executeJavascript(ctx context.Context, req *service.ExecuteRequest) (*servi
 	}
 	defer tmpDir.Close()
 
-	srcFile, err := tmpDir.WriteFile("index.js", req.Source)
-	if err != nil {
-		return nil, err
+	for _, srcFile := range req.Sources {
+		if _, err := tmpDir.WriteFile(srcFile.Path, srcFile.Content); err != nil {
+			return nil, err
+		}
 	}
 
-	cmd := executil.Command(ctx, "node", srcFile).WithStdin(req.Stdin)
+	cmd := executil.Command(ctx, "node", tmpDir.Path()).WithStdin(req.Stdin)
 
 	if err = cmd.Run(); err != nil {
 		return nil, errors.Wrap(err, "execute: Failed to run command")
@@ -64,12 +65,27 @@ func executeTypescript(ctx context.Context, req *service.ExecuteRequest) (*servi
 	}
 	defer tmpDir.Close()
 
-	srcFile, err := tmpDir.WriteFile("index.ts", req.Source)
-	if err != nil {
-		return nil, err
+	for _, srcFile := range req.Sources {
+		if _, err := tmpDir.WriteFile(srcFile.Path, srcFile.Content);err != nil {
+			return nil, err
+		}
 	}
 
-	compileCmd := executil.Command(ctx, "tsc", srcFile)
+	initCmd := executil.Command(ctx, "tsc", "--init").WithDir(tmpDir.Path())
+
+	if err = initCmd.Run(); err != nil {
+		return nil, errors.Wrap(err, "execute: Init command failed")
+	}
+
+	if initCmd.ExitStatus() != 0 {
+		return &service.ExecuteResponse{
+			ExitStatus: initCmd.ExitStatus(),
+			Stdout:     initCmd.Stdout(),
+			Stderr:     initCmd.Stderr(),
+		}, nil
+	}
+
+	compileCmd := executil.Command(ctx, "tsc").WithDir(tmpDir.Path())
 
 	if err = compileCmd.Run(); err != nil {
 		return nil, errors.Wrap(err, "execute: Compile command failed")
@@ -83,7 +99,7 @@ func executeTypescript(ctx context.Context, req *service.ExecuteRequest) (*servi
 		}, nil
 	}
 
-	runCmd := executil.Command(ctx, "node", tmpDir.Join("index.js")).WithStdin(req.Stdin)
+	runCmd := executil.Command(ctx, "node", tmpDir.Path()).WithStdin(req.Stdin)
 
 	if err = runCmd.Run(); err != nil {
 		return nil, errors.Wrap(err, "execute: Run command failed")

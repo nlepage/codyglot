@@ -46,6 +46,12 @@ func (cmd *Cmd) WithStdin(stdin string) *Cmd {
 	return cmd
 }
 
+// WithDir sets the working directory of the command
+func (cmd *Cmd) WithDir(dir string) *Cmd {
+	cmd.cmd.Dir = dir
+	return cmd
+}
+
 // Run runs the command
 func (cmd *Cmd) Run() error {
 	cmd.writeStdin()

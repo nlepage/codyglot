@@ -22,9 +22,14 @@ service Codyglot {
   rpc ping(Ping) returns (Pong) {}
 }
 
+message SourceFile {
+  string path = 1;
+  string content = 2;
+}
+
 message ExecuteRequest {
   string language = 1; // Language of the source code to execute
-  string source = 2; // Source code to execute
+  repeated SourceFile sources = 2; // Source code to execute
   string stdin = 3; // Content sent on the standard input
 }
 

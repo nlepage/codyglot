@@ -95,3 +95,8 @@ func (td *TmpDir) Close() {
 	td.closed = true
 	closed <- td.path
 }
+
+// Path returns the path of the TmpDir
+func (td *TmpDir) Path() string {
+	return td.path
+}

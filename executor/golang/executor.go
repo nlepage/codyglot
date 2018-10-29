@@ -31,14 +31,16 @@ func execute(ctx context.Context, req *service.ExecuteRequest) (*service.Execute
 	}
 	defer tmpDir.Close()
 
-	srcFile, err := tmpDir.WriteFile("main.go", req.Source)
-	if err != nil {
-		return nil, errors.Wrap(err, "execute: Failed to write source file")
+	for _, srcFile := range req.Sources {
+		if _, err := tmpDir.WriteFile(srcFile.Path, srcFile.Content); err != nil {
+			// FIXME format error with file information
+			return nil, errors.Wrap(err, "execute: Failed to write source file")
+		}
 	}
 
 	binFile := tmpDir.Join("main")
 
-	buildCmd := executil.Command(ctx, "go", "build", "-o", binFile, srcFile)
+	buildCmd := executil.Command(ctx, "go", "build", "-o", binFile, ".").WithDir(tmpDir.Path())
 
 	if err = buildCmd.Run(); err != nil {
 		return nil, errors.Wrap(err, "execute: Build command failed")
