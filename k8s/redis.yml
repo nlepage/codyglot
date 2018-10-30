@@ -10,7 +10,7 @@ spec:
         service: redis
     spec:
       containers:
-        - image: redis
+        - image: nlepage/codyglot:redis
           name: redis
 ---
 apiVersion: v1
