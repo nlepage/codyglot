@@ -4,10 +4,11 @@ import (
 	"github.com/nlepage/codyglot/cmd"
 
 	// Import sub commands
-	_ "github.com/nlepage/codyglot/executor/cmd"
 	_ "github.com/nlepage/codyglot/executor/golang/cmd"
 	_ "github.com/nlepage/codyglot/executor/nodejs/cmd"
-	_ "github.com/nlepage/codyglot/router/cmd"
+	_ "github.com/nlepage/codyglot/filestore/client/get/cmd"
+	_ "github.com/nlepage/codyglot/filestore/client/put/cmd"
+	_ "github.com/nlepage/codyglot/filestore/server/cmd"
 	_ "github.com/nlepage/codyglot/router/gateway/cmd"
 	_ "github.com/nlepage/codyglot/router/server/cmd"
 )

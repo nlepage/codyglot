@@ -1,0 +1,24 @@
+syntax = "proto3";
+
+package com.github.nlepage.codyglot.service.filestore;
+option go_package = "filestore";
+
+message FileContent {
+  string path = 1;
+  int32 chmod = 2;
+  bytes content = 3;
+}
+
+message PutResponse {
+  string id = 1;
+}
+
+message GetRequest {
+  string id = 1;
+}
+
+service FileStore {
+  rpc Put(stream FileContent) returns (PutResponse) {}
+  rpc Get(GetRequest) returns (stream FileContent) {}
+}
+  
