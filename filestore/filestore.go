@@ -14,11 +14,11 @@ const (
 	DirMode os.FileMode = 0755
 )
 
-type FileContentRecver interface {
-	Recv() (*service.FileContent, error)
+type FileMessageRecver interface {
+	Recv() (*service.FileMessage, error)
 }
 
-func Write(rcver FileContentRecver, dir string) error {
+func Write(rcver FileMessageRecver, dir string) error {
 	// FIXME wrap errors
 
 	var (
@@ -27,20 +27,21 @@ func Write(rcver FileContentRecver, dir string) error {
 		wg   sync.WaitGroup
 	)
 
-	for fc, err := rcver.Recv(); err != io.EOF; fc, err = rcver.Recv() {
+	for message, err := rcver.Recv(); err != io.EOF; message, err = rcver.Recv() {
 		if err != nil {
 			return err
 		}
 
-		if fc.Path != path {
+		switch fx := message.GetFileMessage().(type) {
+		case *service.FileMessage_FileInfo:
 			close(ch)
-			path = fc.Path
+			path = fx.FileInfo.Path
 			ch = make(chan []byte)
 			wg.Add(1)
-			go writeFile(filepath.Join(dir, path), os.FileMode(fc.Chmod), ch, &wg)
+			go writeFile(filepath.Join(dir, path), os.FileMode(fx.FileInfo.Chmod), ch, &wg)
+		case *service.FileMessage_FileContent:
+			ch <- fx.FileContent.Content
 		}
-
-		ch <- fc.Content
 	}
 
 	close(ch)
@@ -74,11 +75,11 @@ func writeFile(path string, chmod os.FileMode, ch <-chan []byte, wg *sync.WaitGr
 	}
 }
 
-type FileContentSender interface {
-	Send(*service.FileContent) error
+type FileMessageSender interface {
+	Send(*service.FileMessage) error
 }
 
-func SendFile(sender FileContentSender, path string, relPath string, info os.FileInfo, cfg config.FileStoreConfig) error {
+func SendFile(sender FileMessageSender, path string, relPath string, info os.FileInfo, cfg config.FileStoreConfig) error {
 	// FIXME wrap errors
 
 	f, err := os.Open(path)
@@ -86,6 +87,15 @@ func SendFile(sender FileContentSender, path string, relPath string, info os.Fil
 		return err
 	}
 	defer f.Close()
+
+	sender.Send(&service.FileMessage{
+		FileMessage: &service.FileMessage_FileInfo{
+			FileInfo: &service.FileInfo{
+				Path:  relPath,
+				Chmod: int32(info.Mode()),
+			},
+		},
+	})
 
 	// FIXME allocate smaller cap if file is small
 	b := make([]byte, cfg.ChunkSize)
@@ -99,17 +109,19 @@ func SendFile(sender FileContentSender, path string, relPath string, info os.Fil
 			return err
 		}
 
-		sender.Send(&service.FileContent{
-			Path:    relPath,
-			Chmod:   int32(info.Mode()),
-			Content: b[:i],
+		sender.Send(&service.FileMessage{
+			FileMessage: &service.FileMessage_FileContent{
+				FileContent: &service.FileContent{
+					Content: b[:i],
+				},
+			},
 		})
 	}
 
 	return nil
 }
 
-func SendDir(sender FileContentSender, dir string, cfg config.FileStoreConfig, includeDirName bool) error {
+func SendDir(sender FileMessageSender, dir string, cfg config.FileStoreConfig, includeDirName bool) error {
 	dir, err := filepath.Abs(dir)
 	if err != nil {
 		return err

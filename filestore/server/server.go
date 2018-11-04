@@ -64,3 +64,5 @@ func (*Server) Get(req *service.GetRequest, srv service.FileStore_GetServer) err
 
 	return filestore.SendDir(srv, filepath.Join(config.Config.Root, req.Id), config.Config.FileStoreConfig, false)
 }
+
+var _ service.FileStoreServer = &Server{}

@@ -3,10 +3,20 @@ syntax = "proto3";
 package com.github.nlepage.codyglot.service.filestore;
 option go_package = "filestore";
 
-message FileContent {
+message FileInfo {
   string path = 1;
   int32 chmod = 2;
-  bytes content = 3;
+}
+
+message FileContent {
+  bytes content = 1;
+}
+
+message FileMessage {
+  oneof fileMessage {
+    FileInfo fileInfo = 1;
+    FileContent fileContent = 2;
+  }
 }
 
 message PutResponse {
@@ -18,7 +28,7 @@ message GetRequest {
 }
 
 service FileStore {
-  rpc Put(stream FileContent) returns (PutResponse) {}
-  rpc Get(GetRequest) returns (stream FileContent) {}
+  rpc Put(stream FileMessage) returns (PutResponse) {}
+  rpc Get(GetRequest) returns (stream FileMessage) {}
 }
   
