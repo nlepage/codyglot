@@ -13,7 +13,7 @@ func Get(id string) error {
 	return client.GetClient(func(client service.FileStoreClient) error {
 		// FIXME wrap errors
 
-		req, err := client.Get(context.Background(), &service.GetRequest{Id: id})
+		req, err := client.Get(context.Background(), &service.Id{Id: id})
 		if err != nil {
 			return err
 		}

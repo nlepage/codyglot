@@ -55,14 +55,14 @@ func (*Server) Put(srv service.FileStore_PutServer) error {
 		return err
 	}
 
-	return srv.SendAndClose(&service.PutResponse{Id: id})
+	return srv.SendAndClose(&service.Id{Id: id})
 }
 
 // Get handles a get request
-func (*Server) Get(req *service.GetRequest, srv service.FileStore_GetServer) error {
+func (*Server) Get(id *service.Id, srv service.FileStore_GetServer) error {
 	// FIXME wrap errors
 
-	return filestore.SendDir(srv, filepath.Join(config.Config.Root, req.Id), config.Config.FileStoreConfig, false)
+	return filestore.SendDir(srv, filepath.Join(config.Config.Root, id.Id), config.Config.FileStoreConfig, false)
 }
 
 var _ service.FileStoreServer = &Server{}

@@ -19,16 +19,12 @@ message FileMessage {
   }
 }
 
-message PutResponse {
-  string id = 1;
-}
-
-message GetRequest {
+message Id {
   string id = 1;
 }
 
 service FileStore {
-  rpc Put(stream FileMessage) returns (PutResponse) {}
-  rpc Get(GetRequest) returns (stream FileMessage) {}
+  rpc Put(stream FileMessage) returns (Id) {}
+  rpc Get(Id) returns (stream FileMessage) {}
 }
   
