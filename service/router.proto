@@ -1,9 +1,10 @@
 syntax = "proto3";
 
 package com.github.nlepage.codyglot.service;
-option go_package = "service";
+option go_package = "com/github/nlepage/codyglot/service";
 
 import "google/api/annotations.proto";
+import "service/common.proto";
 
 service Codyglot {
   rpc execute(ExecuteRequest) returns (ExecuteResponse) {
@@ -35,13 +36,6 @@ message ExecuteRequest {
   string language = 1; // Language of the source code to execute
   repeated SourceFile sources = 2; // Source code to execute
   repeated Execution executions = 3; // Executions
-}
-
-message CommandResult {
-  uint32 status = 1; // Exit status
-  string stdout = 2; // Standard output
-  string stderr = 3; // Standard error output
-  int64 duration = 4; // Running duration
 }
 
 message ExecuteResponse {

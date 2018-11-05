@@ -13,15 +13,18 @@ RUN go mod download
 COPY ./service /go/app/service
 RUN protoc -I. \
            -I$GOPATH/src/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis \
-           --go_out=plugins=grpc:. \
-           service/router.proto &&\
+           --go_out=plugins=grpc:service \
+           --grpc-gateway_out=logtostderr=true:service \
+           service/common.proto \
+           service/router.proto && \
     protoc -I. \
-           -I$GOPATH/src/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis \
-           --grpc-gateway_out=logtostderr=true:. \
-           service/router.proto &&\
+           --go_out=plugins=grpc:service \
+           service/filestore.proto && \
     protoc -I. \
-           --go_out=plugins=grpc:. \
-           service/filestore/filestore.proto
+           --go_out=plugins=grpc:service \
+           service/compiler.proto && \
+    mv service/com/github/nlepage/codyglot/service/* service/ && \
+    rm -r service/com/
 
 COPY . /go/app
 RUN go install
