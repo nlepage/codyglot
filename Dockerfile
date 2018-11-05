@@ -23,8 +23,8 @@ RUN protoc -I. \
     protoc -I. \
            --go_out=plugins=grpc:service \
            service/compiler.proto && \
-    mv service/com/github/nlepage/codyglot/service/* service/ && \
-    rm -r service/com/
+    mv service/github.com/nlepage/codyglot/service/* service/ && \
+    rm -r service/github.com/
 
 COPY . /go/app
 RUN go install

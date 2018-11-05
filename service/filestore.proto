@@ -1,7 +1,7 @@
 syntax = "proto3";
 
 package com.github.nlepage.codyglot.service.filestore;
-option go_package = "com/github/nlepage/codyglot/service/filestore";
+option go_package = "github.com/nlepage/codyglot/service/filestore";
 
 message FileInfo {
   string path = 1;

@@ -4,6 +4,7 @@ import (
 	"github.com/nlepage/codyglot/cmd"
 
 	// Import sub commands
+	_ "github.com/nlepage/codyglot/compiler/golang/cmd"
 	_ "github.com/nlepage/codyglot/executor/golang/cmd"
 	_ "github.com/nlepage/codyglot/executor/nodejs/cmd"
 	_ "github.com/nlepage/codyglot/filestore/client/get/cmd"
