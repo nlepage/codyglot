@@ -11,17 +11,17 @@ import (
 )
 
 const (
-	golang = "golang"
+	language = "golang"
 )
 
 // Executor returns Golang Executor
 func Executor() *executor.Executor {
-	return executor.New(execute, []string{golang})
+	return executor.New(execute, []string{language})
 }
 
 // Execute executes Go(lang) code
 func execute(ctx context.Context, req *service.ExecuteRequest) (*service.ExecuteResponse, error) {
-	if req.Language != golang {
+	if req.Language != language {
 		return nil, errors.Errorf("execute: Unsupported language %s", req.Language)
 	}
 
@@ -43,25 +43,28 @@ func execute(ctx context.Context, req *service.ExecuteRequest) (*service.Execute
 		return nil, errors.Wrap(err, "execute: Build command failed")
 	}
 
-	if buildCmd.ExitStatus() != 0 {
+	buildRes := buildCmd.CommandResult()
+
+	if buildRes.Status != 0 {
 		return &service.ExecuteResponse{
-			ExitStatus: buildCmd.ExitStatus(),
-			Stdout:     buildCmd.Stdout(),
-			Stderr:     buildCmd.Stderr(),
+			Compilation: buildRes,
 		}, nil
 	}
 
-	runCmd := executil.Command(ctx, binFile).WithStdin(req.Stdin)
+	execRes := make([]*service.CommandResult, 0, len(req.Executions))
 
-	if err := runCmd.Run(); err != nil {
-		return nil, errors.Wrap(err, "execute: Run command failed")
+	for _, execReq := range req.Executions {
+		runCmd := executil.Command(ctx, binFile).WithStdin(execReq.Stdin)
+
+		if err := runCmd.Run(); err != nil {
+			return nil, errors.Wrap(err, "execute: Run command failed")
+		}
+
+		execRes = append(execRes, runCmd.CommandResult())
 	}
 
 	return &service.ExecuteResponse{
-		ExitStatus:      runCmd.ExitStatus(),
-		Stdout:          runCmd.Stdout(),
-		Stderr:          runCmd.Stderr(),
-		CompilationTime: buildCmd.Duration(),
-		RunningTime:     runCmd.Duration(),
+		Compilation: buildRes,
+		Executions:  execRes,
 	}, nil
 }

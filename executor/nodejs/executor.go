@@ -44,17 +44,20 @@ func executeJavascript(ctx context.Context, req *service.ExecuteRequest) (*servi
 		return nil, err
 	}
 
-	cmd := executil.Command(ctx, "node", tmpDir.Path()).WithStdin(req.Stdin)
+	execResults := make([]*service.CommandResult, 0, len(req.Executions))
 
-	if err = cmd.Run(); err != nil {
-		return nil, errors.Wrap(err, "execute: Failed to run command")
+	for _, execReq := range req.Executions {
+		cmd := executil.Command(ctx, "node", tmpDir.Path()).WithStdin(execReq.Stdin)
+
+		if err = cmd.Run(); err != nil {
+			return nil, errors.Wrap(err, "execute: Failed to run command")
+		}
+
+		execResults = append(execResults, cmd.CommandResult())
 	}
 
 	return &service.ExecuteResponse{
-		ExitStatus:  cmd.ExitStatus(),
-		Stdout:      cmd.Stdout(),
-		Stderr:      cmd.Stderr(),
-		RunningTime: cmd.Duration(),
+		Executions: execResults,
 	}, nil
 }
 
@@ -75,11 +78,9 @@ func executeTypescript(ctx context.Context, req *service.ExecuteRequest) (*servi
 		return nil, errors.Wrap(err, "execute: Init command failed")
 	}
 
-	if initCmd.ExitStatus() != 0 {
+	if initRes := initCmd.CommandResult(); initRes.Status != 0 {
 		return &service.ExecuteResponse{
-			ExitStatus: initCmd.ExitStatus(),
-			Stdout:     initCmd.Stdout(),
-			Stderr:     initCmd.Stderr(),
+			Compilation: initRes,
 		}, nil
 	}
 
@@ -89,25 +90,28 @@ func executeTypescript(ctx context.Context, req *service.ExecuteRequest) (*servi
 		return nil, errors.Wrap(err, "execute: Compile command failed")
 	}
 
-	if compileCmd.ExitStatus() != 0 {
+	compileRes := compileCmd.CommandResult()
+
+	if compileRes.Status != 0 {
 		return &service.ExecuteResponse{
-			ExitStatus: compileCmd.ExitStatus(),
-			Stdout:     compileCmd.Stdout(),
-			Stderr:     compileCmd.Stderr(),
+			Compilation: compileRes,
 		}, nil
 	}
 
-	runCmd := executil.Command(ctx, "node", tmpDir.Path()).WithStdin(req.Stdin)
+	execRes := make([]*service.CommandResult, 0, len(req.Executions))
 
-	if err = runCmd.Run(); err != nil {
-		return nil, errors.Wrap(err, "execute: Run command failed")
+	for _, execReq := range req.Executions {
+		runCmd := executil.Command(ctx, "node", tmpDir.Path()).WithStdin(execReq.Stdin)
+
+		if err = runCmd.Run(); err != nil {
+			return nil, errors.Wrap(err, "execute: Run command failed")
+		}
+
+		execRes = append(execRes, runCmd.CommandResult())
 	}
 
 	return &service.ExecuteResponse{
-		ExitStatus:      runCmd.ExitStatus(),
-		Stdout:          runCmd.Stdout(),
-		Stderr:          runCmd.Stderr(),
-		CompilationTime: compileCmd.Duration(),
-		RunningTime:     runCmd.Duration(),
+		Compilation: compileRes,
+		Executions:  execRes,
 	}, nil
 }

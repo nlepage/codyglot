@@ -27,18 +27,26 @@ message SourceFile {
   string content = 2;
 }
 
+message Execution {
+  string stdin = 1; // Content sent on the standard input
+}
+
 message ExecuteRequest {
   string language = 1; // Language of the source code to execute
   repeated SourceFile sources = 2; // Source code to execute
-  string stdin = 3; // Content sent on the standard input
+  repeated Execution executions = 3; // Executions
+}
+
+message CommandResult {
+  uint32 status = 1; // Exit status
+  string stdout = 2; // Standard output
+  string stderr = 3; // Standard error output
+  int64 duration = 4; // Running duration
 }
 
 message ExecuteResponse {
-  uint32 exitStatus = 1; // Exit status of the program
-  string stdout = 2; // Content received on the standard output
-  string stderr = 3; // Content received on the standard error output
-  int64 compilationTime = 4; // Compilation time
-  int64 runningTime = 5; // Running time
+  CommandResult compilation = 1; // Compilation result
+  repeated CommandResult executions = 2; // Executions results
 }
 
 message LanguagesRequest {}

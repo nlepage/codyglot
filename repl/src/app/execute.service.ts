@@ -3,11 +3,16 @@ import { Injectable } from '@angular/core';
 
 import 'rxjs/add/operator/finally';
 
-export interface ExecuteResult {
+interface CommandResult {
+  status: number;
   stdout: string;
   stderr: string;
-  compilationTime: string;
-  runningTime: string;
+  duration: number;
+}
+
+export interface ExecuteResult {
+  compilation: CommandResult;
+  executions: [CommandResult];
 }
 
 @Injectable()
@@ -35,7 +40,9 @@ export class ExecuteService {
               content: source,
             },
           ],
-          stdin,
+          executions: [
+            { stdin },
+          ],
         },
       )
       .finally(() => this.executing = false)

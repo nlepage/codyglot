@@ -23,5 +23,7 @@ export class ToolbarComponent {
 
   get result() { return this.executeService.result; }
 
+  get execution() { return this.result && this.result.executions && this.result.executions[0] }
+
   get executing() { return this.executeService.executing; }
 }

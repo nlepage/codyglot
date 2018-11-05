@@ -2,6 +2,6 @@
   <app-toolbar (run)="execute($event)"></app-toolbar>
   <app-source (sourceChange)="source = $event"></app-source>
   <app-stdxxx class="stdin" title="Standard input" (contentChange)="stdin = $event"></app-stdxxx>
-  <app-stdxxx class="stdout" title="Standard output" [readonly]="true" [content]="result?.stdout"></app-stdxxx>
-  <app-stdxxx class="stderr" title="Standard error" [readonly]="true" [content]="result?.stderr"></app-stdxxx>
+  <app-stdxxx class="stdout" title="Standard output" [readonly]="true" [content]="stdout"></app-stdxxx>
+  <app-stdxxx class="stderr" title="Standard error" [readonly]="true" [content]="stderr"></app-stdxxx>
 </div>

@@ -10,6 +10,7 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/nlepage/codyglot/service"
 	"github.com/pkg/errors"
 )
 
@@ -62,9 +63,9 @@ func (cmd *Cmd) Run() error {
 	return cmd.error()
 }
 
-// ExitStatus returns exit status
-func (cmd *Cmd) ExitStatus() uint32 {
-	cmd.checkErrors("ExitStatus")
+// Status returns exit status
+func (cmd *Cmd) Status() uint32 {
+	cmd.checkErrors("Status")
 
 	if cmd.exitErr == nil {
 		return 0
@@ -92,10 +93,21 @@ func (cmd *Cmd) Stderr() string {
 	return string(cmd.stderr.Bytes())
 }
 
+// Duration returns duration of execution
 func (cmd *Cmd) Duration() int64 {
 	cmd.checkErrors("Duration")
 
 	return int64(cmd.duration)
+}
+
+// CommandResult returns result of execution
+func (cmd *Cmd) CommandResult() *service.CommandResult {
+	return &service.CommandResult{
+		Status:   cmd.Status(),
+		Stdout:   cmd.Stdout(),
+		Stderr:   cmd.Stderr(),
+		Duration: cmd.Duration(),
+	}
 }
 
 func (cmd *Cmd) writeStdin() {
