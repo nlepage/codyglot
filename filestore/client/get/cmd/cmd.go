@@ -1,8 +1,8 @@
 package cmd
 
 import (
+	"github.com/nlepage/codyglot/filestore"
 	"github.com/nlepage/codyglot/filestore/client/cmd"
-	"github.com/nlepage/codyglot/filestore/client/get"
 	"github.com/nlepage/codyglot/filestore/client/get/config"
 	"github.com/spf13/cobra"
 )
@@ -12,7 +12,7 @@ var _cmd = &cobra.Command{
 	Use:   "get",
 	Args:  cobra.ExactArgs(1),
 	RunE: func(_ *cobra.Command, args []string) error {
-		return get.Get(args[0])
+		return filestore.Get(args[0])
 	},
 }
 

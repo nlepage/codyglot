@@ -1,4 +1,4 @@
-package server
+package filestore
 
 import (
 	"fmt"
@@ -7,23 +7,24 @@ import (
 	"path/filepath"
 
 	"github.com/google/uuid"
-	"github.com/nlepage/codyglot/filestore"
 	"github.com/nlepage/codyglot/filestore/server/config"
 	service "github.com/nlepage/codyglot/service/filestore"
 	"google.golang.org/grpc"
 )
 
 // Server is the file store server
-type Server struct{}
+type Server struct {
+	Cfg config.FileStoreServerConfig
+}
 
 // Init initializes file store server
-func Init() error {
-	return os.MkdirAll(config.Config.Root, filestore.DirMode)
+func (s *Server) Init() error {
+	return os.MkdirAll(s.Cfg.Root, dirMode)
 }
 
 // Serve starts listening for gRPC requests
 func (s *Server) Serve() error {
-	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", config.Config.Port))
+	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", s.Cfg.Port))
 	if err != nil {
 		return fmt.Errorf("Failed to listen: %v", err)
 	}
@@ -40,18 +41,18 @@ func (s *Server) Serve() error {
 // TODO reverse channel for errors ?
 
 // Put handles a put request
-func (*Server) Put(srv service.FileStore_PutServer) error {
+func (s *Server) Put(srv service.FileStore_PutServer) error {
 	// FIXME wrap errors
 
 	id := uuid.New().String()
 
-	dir := filepath.Join(config.Config.Root, id)
+	dir := filepath.Join(s.Cfg.Root, id)
 
-	if err := os.Mkdir(dir, filestore.DirMode); err != nil {
+	if err := os.Mkdir(dir, dirMode); err != nil {
 		return err
 	}
 
-	if err := filestore.Write(srv, dir); err != nil {
+	if err := recv(srv, dir); err != nil {
 		return err
 	}
 
@@ -59,10 +60,10 @@ func (*Server) Put(srv service.FileStore_PutServer) error {
 }
 
 // Get handles a get request
-func (*Server) Get(id *service.Id, srv service.FileStore_GetServer) error {
+func (s *Server) Get(id *service.Id, srv service.FileStore_GetServer) error {
 	// FIXME wrap errors
 
-	return filestore.SendDir(srv, filepath.Join(config.Config.Root, id.Id), config.Config.FileStoreConfig, false)
+	return sendDir(srv, filepath.Join(s.Cfg.Root, id.Id), s.Cfg.FileStoreConfig, false)
 }
 
 var _ service.FileStoreServer = &Server{}

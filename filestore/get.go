@@ -1,16 +1,14 @@
-package get
+package filestore
 
 import (
 	"context"
 
-	"github.com/nlepage/codyglot/filestore"
-	"github.com/nlepage/codyglot/filestore/client"
 	"github.com/nlepage/codyglot/filestore/client/get/config"
 	service "github.com/nlepage/codyglot/service/filestore"
 )
 
 func Get(id string) error {
-	return client.GetClient(func(client service.FileStoreClient) error {
+	return request(func(client service.FileStoreClient) error {
 		// FIXME wrap errors
 
 		req, err := client.Get(context.Background(), &service.Id{Id: id})
@@ -18,7 +16,7 @@ func Get(id string) error {
 			return err
 		}
 
-		if err := filestore.Write(req, config.Config.OutputDir); err != nil {
+		if err := recv(req, config.Config.OutputDir); err != nil {
 			return err
 		}
 

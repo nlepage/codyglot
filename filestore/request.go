@@ -1,14 +1,14 @@
-package client
+package filestore
 
 import (
 	"fmt"
 
 	"github.com/nlepage/codyglot/filestore/client/config"
-	"github.com/nlepage/codyglot/service/filestore"
+	service "github.com/nlepage/codyglot/service/filestore"
 	"google.golang.org/grpc"
 )
 
-func GetClient(fn func(filestore.FileStoreClient) error, cfg config.FileStoreClientConfig) error {
+func request(fn func(service.FileStoreClient) error, cfg config.FileStoreClientConfig) error {
 	hostport := fmt.Sprintf("%s:%d", cfg.Host, cfg.Port)
 	opts := []grpc.DialOption{grpc.WithInsecure()}
 
@@ -18,5 +18,5 @@ func GetClient(fn func(filestore.FileStoreClient) error, cfg config.FileStoreCli
 	}
 	defer conn.Close()
 
-	return fn(filestore.NewFileStoreClient(conn))
+	return fn(service.NewFileStoreClient(conn))
 }
