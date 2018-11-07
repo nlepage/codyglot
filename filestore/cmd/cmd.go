@@ -1,8 +1,8 @@
 package cmd
 
 import (
+	"github.com/nlepage/codyglot/filestore"
 	"github.com/nlepage/codyglot/cmd"
-	"github.com/nlepage/codyglot/filestore/config"
 	"github.com/spf13/cobra"
 )
 
@@ -16,7 +16,7 @@ func init() {
 	cmd.Cmd.AddCommand(Cmd)
 }
 
-func AddCommand(_cmd *cobra.Command, cfg *config.FileStoreConfig) {
-	_cmd.Flags().IntVar(&cfg.ChunkSize, "chunk-size", config.DefaultChunkSize, "Chunk size for sending large files")
+func AddCommand(_cmd *cobra.Command, config *filestore.Config) {
+	_cmd.Flags().IntVar(&config.ChunkSize, "chunk-size", filestore.DefaultChunkSize, "Chunk size for sending large files")
 	Cmd.AddCommand(_cmd)
 }

@@ -7,24 +7,23 @@ import (
 	"path/filepath"
 
 	"github.com/google/uuid"
-	"github.com/nlepage/codyglot/filestore/server/config"
 	service "github.com/nlepage/codyglot/service/filestore"
 	"google.golang.org/grpc"
 )
 
 // Server is the file store server
 type Server struct {
-	Cfg config.FileStoreServerConfig
+	Config ServerConfig
 }
 
 // Init initializes file store server
 func (s *Server) Init() error {
-	return os.MkdirAll(s.Cfg.Root, dirMode)
+	return os.MkdirAll(s.Config.Root, dirMode)
 }
 
 // Serve starts listening for gRPC requests
 func (s *Server) Serve() error {
-	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", s.Cfg.Port))
+	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", s.Config.Port))
 	if err != nil {
 		return fmt.Errorf("Failed to listen: %v", err)
 	}
@@ -46,7 +45,7 @@ func (s *Server) Put(srv service.FileStore_PutServer) error {
 
 	id := uuid.New().String()
 
-	dir := filepath.Join(s.Cfg.Root, id)
+	dir := filepath.Join(s.Config.Root, id)
 
 	if err := os.Mkdir(dir, dirMode); err != nil {
 		return err
@@ -63,7 +62,7 @@ func (s *Server) Put(srv service.FileStore_PutServer) error {
 func (s *Server) Get(id *service.Id, srv service.FileStore_GetServer) error {
 	// FIXME wrap errors
 
-	return sendDir(srv, filepath.Join(s.Cfg.Root, id.Id), s.Cfg.FileStoreConfig, false)
+	return sendDir(srv, filepath.Join(s.Config.Root, id.Id), s.Config.Config, false)
 }
 
 var _ service.FileStoreServer = &Server{}

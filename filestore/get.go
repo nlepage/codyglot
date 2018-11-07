@@ -3,11 +3,10 @@ package filestore
 import (
 	"context"
 
-	"github.com/nlepage/codyglot/filestore/client/get/config"
 	service "github.com/nlepage/codyglot/service/filestore"
 )
 
-func Get(id string) error {
+func Get(id string, config GetConfig) error {
 	return request(func(client service.FileStoreClient) error {
 		// FIXME wrap errors
 
@@ -16,10 +15,10 @@ func Get(id string) error {
 			return err
 		}
 
-		if err := recv(req, config.Config.OutputDir); err != nil {
+		if err := recv(req, config.OutputDir); err != nil {
 			return err
 		}
 
 		return req.CloseSend()
-	}, config.Config.FileStoreClientConfig)
+	}, config.ClientConfig)
 }

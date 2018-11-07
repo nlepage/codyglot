@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/nlepage/codyglot/filestore/client/put/config"
 	service "github.com/nlepage/codyglot/service/filestore"
 	log "github.com/sirupsen/logrus"
 )
@@ -13,7 +12,7 @@ import (
 // FIXME log should log on stderr
 
 // Put puts files to a store server
-func Put(files []string) error {
+func Put(files []string, config ClientConfig) error {
 	return request(func(client service.FileStoreClient) error {
 		// FIXME wrap errors
 
@@ -29,11 +28,11 @@ func Put(files []string) error {
 			}
 
 			if info.IsDir() {
-				if err := sendDir(req, file, config.Config.FileStoreConfig, true); err != nil {
+				if err := sendDir(req, file, config.Config, true); err != nil {
 					log.WithError(err).Errorf("Error while walking dir %s", file)
 				}
 			} else {
-				if err := sendFile(req, file, info.Name(), info, config.Config.FileStoreConfig); err != nil {
+				if err := sendFile(req, file, info.Name(), info, config.Config); err != nil {
 					log.WithError(err).Errorf("Could not send file %s", file)
 				}
 			}
@@ -47,5 +46,5 @@ func Put(files []string) error {
 		fmt.Println(res.Id)
 
 		return nil
-	}, config.Config)
+	}, config)
 }
