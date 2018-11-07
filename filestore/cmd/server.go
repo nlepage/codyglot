@@ -2,14 +2,13 @@ package cmd
 
 import (
 	"github.com/nlepage/codyglot/filestore"
-	"github.com/nlepage/codyglot/filestore/cmd"
 	"github.com/spf13/cobra"
 )
 
 var (
 	server = &filestore.Server{}
 
-	_cmd = &cobra.Command{
+	serverCmd = &cobra.Command{
 		Short: "Starts a file store server",
 		Use:   "server",
 		RunE: func(_ *cobra.Command, _ []string) error {
@@ -22,7 +21,7 @@ var (
 )
 
 func init() {
-	_cmd.Flags().IntVarP(&server.Config.Port, "port", "p", filestore.DefaultPort, "Listening port")
-	_cmd.Flags().StringVarP(&server.Config.Root, "root", "d", filestore.DefaultRoot, "Root directory")
-	cmd.AddCommand(_cmd, &server.Config.Config)
+	serverCmd.Flags().IntVarP(&server.Config.Port, "port", "p", filestore.DefaultPort, "Listening port")
+	serverCmd.Flags().StringVarP(&server.Config.Root, "root", "d", filestore.DefaultRoot, "Root directory")
+	addCommand(serverCmd, &server.Config.Config)
 }
