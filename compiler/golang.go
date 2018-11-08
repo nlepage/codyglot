@@ -3,7 +3,8 @@ package compiler
 import (
 	"context"
 
-	"github.com/nlepage/codyglot/executor/executil"
+	// FIXME move this out of executor
+	"github.com/nlepage/codyglot/exec"
 	"github.com/nlepage/codyglot/executor/tmputil"
 	"github.com/nlepage/codyglot/filestore"
 	svc "github.com/nlepage/codyglot/service/compiler"
@@ -32,7 +33,7 @@ func (config Golang) compile(ctx context.Context, srcId *fssvc.Id) (*svc.Compile
 
 	binFile := tmpDir.Join("main")
 
-	buildCmd := executil.Command(ctx, "go", "build", "-o", binFile, srcDir).WithDir(tmpDir.Path())
+	buildCmd := exec.Command(ctx, "go", "build", "-o", binFile, srcDir).WithDir(tmpDir.Path())
 
 	if err = buildCmd.Run(); err != nil {
 		return nil, errors.Wrap(err, "execute: Build command failed")

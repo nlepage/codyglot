@@ -3,8 +3,8 @@ package nodejs
 import (
 	"context"
 
+	"github.com/nlepage/codyglot/exec"
 	"github.com/nlepage/codyglot/executor"
-	"github.com/nlepage/codyglot/executor/executil"
 	"github.com/nlepage/codyglot/executor/tmputil"
 	"github.com/nlepage/codyglot/service"
 	"github.com/pkg/errors"
@@ -47,7 +47,7 @@ func executeJavascript(ctx context.Context, req *service.ExecuteRequest) (*servi
 	execResults := make([]*service.CommandResult, 0, len(req.Executions))
 
 	for _, execReq := range req.Executions {
-		cmd := executil.Command(ctx, "node", tmpDir.Path()).WithStdin(execReq.Stdin)
+		cmd := exec.Command(ctx, "node", tmpDir.Path()).WithStdin(execReq.Stdin)
 
 		if err = cmd.Run(); err != nil {
 			return nil, errors.Wrap(err, "execute: Failed to run command")
@@ -72,7 +72,7 @@ func executeTypescript(ctx context.Context, req *service.ExecuteRequest) (*servi
 		return nil, err
 	}
 
-	initCmd := executil.Command(ctx, "tsc", "--init").WithDir(tmpDir.Path())
+	initCmd := exec.Command(ctx, "tsc", "--init").WithDir(tmpDir.Path())
 
 	if err = initCmd.Run(); err != nil {
 		return nil, errors.Wrap(err, "execute: Init command failed")
@@ -84,7 +84,7 @@ func executeTypescript(ctx context.Context, req *service.ExecuteRequest) (*servi
 		}, nil
 	}
 
-	compileCmd := executil.Command(ctx, "tsc").WithDir(tmpDir.Path())
+	compileCmd := exec.Command(ctx, "tsc").WithDir(tmpDir.Path())
 
 	if err = compileCmd.Run(); err != nil {
 		return nil, errors.Wrap(err, "execute: Compile command failed")
@@ -101,7 +101,7 @@ func executeTypescript(ctx context.Context, req *service.ExecuteRequest) (*servi
 	execRes := make([]*service.CommandResult, 0, len(req.Executions))
 
 	for _, execReq := range req.Executions {
-		runCmd := executil.Command(ctx, "node", tmpDir.Path()).WithStdin(execReq.Stdin)
+		runCmd := exec.Command(ctx, "node", tmpDir.Path()).WithStdin(execReq.Stdin)
 
 		if err = runCmd.Run(); err != nil {
 			return nil, errors.Wrap(err, "execute: Run command failed")

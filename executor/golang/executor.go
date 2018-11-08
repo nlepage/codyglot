@@ -3,8 +3,8 @@ package golang
 import (
 	"context"
 
+	"github.com/nlepage/codyglot/exec"
 	"github.com/nlepage/codyglot/executor"
-	"github.com/nlepage/codyglot/executor/executil"
 	"github.com/nlepage/codyglot/executor/tmputil"
 	"github.com/nlepage/codyglot/service"
 	"github.com/pkg/errors"
@@ -37,7 +37,7 @@ func execute(ctx context.Context, req *service.ExecuteRequest) (*service.Execute
 
 	binFile := tmpDir.Join("main")
 
-	buildCmd := executil.Command(ctx, "go", "build", "-o", binFile, ".").WithDir(tmpDir.Path())
+	buildCmd := exec.Command(ctx, "go", "build", "-o", binFile, ".").WithDir(tmpDir.Path())
 
 	if err = buildCmd.Run(); err != nil {
 		return nil, errors.Wrap(err, "execute: Build command failed")
@@ -54,7 +54,7 @@ func execute(ctx context.Context, req *service.ExecuteRequest) (*service.Execute
 	execRes := make([]*service.CommandResult, 0, len(req.Executions))
 
 	for _, execReq := range req.Executions {
-		runCmd := executil.Command(ctx, binFile).WithStdin(execReq.Stdin)
+		runCmd := exec.Command(ctx, binFile).WithStdin(execReq.Stdin)
 
 		if err := runCmd.Run(); err != nil {
 			return nil, errors.Wrap(err, "execute: Run command failed")

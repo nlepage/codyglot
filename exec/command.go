@@ -1,4 +1,4 @@
-package executil
+package exec
 
 import (
 	"bytes"
