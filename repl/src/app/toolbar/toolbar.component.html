@@ -11,5 +11,5 @@
     Run
   </button>
   <div class="time" *ngIf="result?.compilation">Compiled in {{result.compilation.duration / 1000000 | number:'1.0-2'}}ms</div>
-  <div class="time" *ngIf="execution">Ran in {{execution / 1000000 | number:'1.0-2'}}ms</div>
+  <div class="time" *ngIf="execution">Ran in {{execution.duration / 1000000 | number:'1.0-2'}}ms</div>
 </div>
