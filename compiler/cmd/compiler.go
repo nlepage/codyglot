@@ -18,4 +18,5 @@ func init() {
 
 func addCommand(_cmd *cobra.Command, config *compiler.Config) {
 	Compiler.Flags().IntVarP(&config.Port, "port", "p", compiler.DefaultPort, "Listening port")
+	Compiler.AddCommand(_cmd)
 }
