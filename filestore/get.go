@@ -6,7 +6,7 @@ import (
 	service "github.com/nlepage/codyglot/service/filestore"
 )
 
-func Get(id string, config GetConfig) error {
+func Get(id string, dir string, config ClientConfig) error {
 	return request(func(client service.FileStoreClient) error {
 		// FIXME wrap errors
 
@@ -15,10 +15,10 @@ func Get(id string, config GetConfig) error {
 			return err
 		}
 
-		if err := recv(req, config.OutputDir); err != nil {
+		if err := recv(req, dir); err != nil {
 			return err
 		}
 
 		return req.CloseSend()
-	}, config.ClientConfig)
+	}, config)
 }

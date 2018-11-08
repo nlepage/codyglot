@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"net"
 
-	"github.com/nlepage/codyglot/compiler/config"
 	svc "github.com/nlepage/codyglot/service/compiler"
 	fssvc "github.com/nlepage/codyglot/service/filestore"
 	"github.com/pkg/errors"
@@ -15,13 +14,8 @@ import (
 
 // Compiler is a struct implementing CompilerServer as a specific compiler
 type Compiler struct {
-	// TODO remove struct ?
-	fn func(context.Context, *fssvc.Id) (*svc.CompileResult, error)
-}
-
-// New creates a new Compiler
-func New(fn func(context.Context, *fssvc.Id) (*svc.CompileResult, error)) *Compiler {
-	return &Compiler{fn}
+	fn     func(context.Context, *fssvc.Id) (*svc.CompileResult, error)
+	config Config
 }
 
 // Compile calls Compiler.fn
@@ -33,9 +27,9 @@ var _ svc.CompilerServer = (*Compiler)(nil)
 
 // Serve starts listening for gRPC requests
 func (c *Compiler) Serve() error {
-	log.Infoln("Starting compiler on port", config.Config.Port)
+	log.Infoln("Starting compiler on port", c.config.Port)
 
-	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", config.Config.Port))
+	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", c.config.Port))
 	if err != nil {
 		return errors.Wrap(err, "Compiler: Failed to listen")
 	}
