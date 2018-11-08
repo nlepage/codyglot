@@ -1,4 +1,4 @@
-package tmputil
+package ioutil
 
 import (
 	"fmt"
@@ -6,8 +6,9 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+	"sync"
 
-	"github.com/nlepage/codyglot/executor/config"
+	"github.com/nlepage/codyglot/config"
 	"github.com/nlepage/codyglot/service"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
@@ -18,7 +19,8 @@ const (
 )
 
 var (
-	closed chan string
+	closed           chan string
+	startCleanupOnce sync.Once
 )
 
 // TmpDir is a temporary directory
@@ -27,8 +29,7 @@ type TmpDir struct {
 	closed bool
 }
 
-// StartCleanup fires up the cleanup routines
-func StartCleanup() {
+func startCleanup() {
 	closed = make(chan string, config.CleanupBuffer)
 
 	for i := 0; i < config.CleanupRoutines; i++ {
@@ -44,6 +45,8 @@ func StartCleanup() {
 
 // NewTmpDir creates a new TmpDir
 func NewTmpDir() (*TmpDir, error) {
+	startCleanupOnce.Do(startCleanup)
+
 	path, err := ioutil.TempDir("", tempDirPrefix)
 	if err != nil {
 		return nil, errors.Wrap(err, "TmpDir: Failed to create temp dir")

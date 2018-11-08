@@ -5,7 +5,7 @@ import (
 
 	"github.com/nlepage/codyglot/exec"
 	"github.com/nlepage/codyglot/executor"
-	"github.com/nlepage/codyglot/executor/tmputil"
+	"github.com/nlepage/codyglot/ioutil"
 	"github.com/nlepage/codyglot/service"
 	"github.com/pkg/errors"
 )
@@ -34,7 +34,7 @@ func execute(ctx context.Context, req *service.ExecuteRequest) (*service.Execute
 // FIXME wrap errors
 
 func executeJavascript(ctx context.Context, req *service.ExecuteRequest) (*service.ExecuteResponse, error) {
-	tmpDir, err := tmputil.NewTmpDir()
+	tmpDir, err := ioutil.NewTmpDir()
 	if err != nil {
 		return nil, err
 	}
@@ -62,7 +62,7 @@ func executeJavascript(ctx context.Context, req *service.ExecuteRequest) (*servi
 }
 
 func executeTypescript(ctx context.Context, req *service.ExecuteRequest) (*service.ExecuteResponse, error) {
-	tmpDir, err := tmputil.NewTmpDir()
+	tmpDir, err := ioutil.NewTmpDir()
 	if err != nil {
 		return nil, err
 	}

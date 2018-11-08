@@ -3,10 +3,9 @@ package compiler
 import (
 	"context"
 
-	// FIXME move this out of executor
 	"github.com/nlepage/codyglot/exec"
-	"github.com/nlepage/codyglot/executor/tmputil"
 	"github.com/nlepage/codyglot/filestore"
+	"github.com/nlepage/codyglot/ioutil"
 	svc "github.com/nlepage/codyglot/service/compiler"
 	fssvc "github.com/nlepage/codyglot/service/filestore"
 	"github.com/pkg/errors"
@@ -19,7 +18,7 @@ func (config Golang) Compiler() *Compiler {
 }
 
 func (config Golang) compile(ctx context.Context, srcId *fssvc.Id) (*svc.CompileResult, error) {
-	tmpDir, err := tmputil.NewTmpDir()
+	tmpDir, err := ioutil.NewTmpDir()
 	if err != nil {
 		return nil, err
 	}

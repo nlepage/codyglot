@@ -5,7 +5,7 @@ import (
 
 	"github.com/nlepage/codyglot/exec"
 	"github.com/nlepage/codyglot/executor"
-	"github.com/nlepage/codyglot/executor/tmputil"
+	"github.com/nlepage/codyglot/ioutil"
 	"github.com/nlepage/codyglot/service"
 	"github.com/pkg/errors"
 )
@@ -25,7 +25,7 @@ func execute(ctx context.Context, req *service.ExecuteRequest) (*service.Execute
 		return nil, errors.Errorf("execute: Unsupported language %s", req.Language)
 	}
 
-	tmpDir, err := tmputil.NewTmpDir()
+	tmpDir, err := ioutil.NewTmpDir()
 	if err != nil {
 		return nil, err
 	}
