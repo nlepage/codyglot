@@ -12,7 +12,7 @@ var (
 		Use:   "golang",
 		Short: "Start Codyglot Go(lang) compiler",
 		RunE: func(_ *cobra.Command, _ []string) error {
-			return compiler.Golang(config).Compiler().Serve()
+			return compiler.Golang(config).Server().Serve()
 		},
 	}
 )

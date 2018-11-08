@@ -12,32 +12,32 @@ import (
 	"google.golang.org/grpc"
 )
 
-// Compiler is a struct implementing CompilerServer as a specific compiler
-type Compiler struct {
+// Server is a struct implementing CompilerServer as a specific compiler
+type Server struct {
 	fn     func(context.Context, *fssvc.Id) (*svc.CompileResult, error)
 	config Config
 }
 
-// Compile calls Compiler.fn
-func (c *Compiler) Compile(ctx context.Context, fsID *fssvc.Id) (*svc.CompileResult, error) {
+// Compile calls Server.fn
+func (c *Server) Compile(ctx context.Context, fsID *fssvc.Id) (*svc.CompileResult, error) {
 	return c.fn(ctx, fsID)
 }
 
-var _ svc.CompilerServer = (*Compiler)(nil)
+var _ svc.CompilerServer = (*Server)(nil)
 
 // Serve starts listening for gRPC requests
-func (c *Compiler) Serve() error {
+func (c *Server) Serve() error {
 	log.Infoln("Starting compiler on port", c.config.Port)
 
 	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", c.config.Port))
 	if err != nil {
-		return errors.Wrap(err, "Compiler: Failed to listen")
+		return errors.Wrap(err, "Server: Failed to listen")
 	}
 
 	grpcSrv := grpc.NewServer()
 	svc.RegisterCompilerServer(grpcSrv, c)
 	if err := grpcSrv.Serve(lis); err != nil {
-		return errors.Wrap(err, "Compiler: Failed to serve")
+		return errors.Wrap(err, "Server: Failed to serve")
 	}
 
 	return nil

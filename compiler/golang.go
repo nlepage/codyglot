@@ -12,8 +12,8 @@ import (
 
 type Golang Config
 
-func (config Golang) Compiler() *Compiler {
-	return &Compiler{config.compile, Config(config)}
+func (config Golang) Server() *Server {
+	return &Server{config.compile, Config(config)}
 }
 
 func (config Golang) compile(ctx context.Context, srcId *fssvc.Id) (*svc.CompileResult, error) {
