@@ -1,6 +1,8 @@
 package cmd
 
 import (
+	"fmt"
+
 	"github.com/nlepage/codyglot/filestore"
 	"github.com/spf13/cobra"
 )
@@ -13,7 +15,14 @@ var (
 		Use:   "put",
 		Args:  cobra.MinimumNArgs(1),
 		RunE: func(_ *cobra.Command, args []string) error {
-			return filestore.Put(args, putConfig)
+			id, err := filestore.Put(args, putConfig)
+			if err != nil {
+				return err
+			}
+
+			fmt.Println(id.Id)
+
+			return nil
 		},
 	}
 )

@@ -8,7 +8,6 @@ import (
 	"github.com/nlepage/codyglot/ioutil"
 	svc "github.com/nlepage/codyglot/service/compiler"
 	fssvc "github.com/nlepage/codyglot/service/filestore"
-	"github.com/pkg/errors"
 )
 
 type Golang Config
@@ -18,6 +17,8 @@ func (config Golang) Compiler() *Compiler {
 }
 
 func (config Golang) compile(ctx context.Context, srcId *fssvc.Id) (*svc.CompileResult, error) {
+	// FIXME errors
+
 	tmpDir, err := ioutil.NewTmpDir()
 	if err != nil {
 		return nil, err
@@ -35,16 +36,20 @@ func (config Golang) compile(ctx context.Context, srcId *fssvc.Id) (*svc.Compile
 	buildCmd := exec.Command(ctx, "go", "build", "-o", binFile, srcDir).WithDir(tmpDir.Path())
 
 	if err = buildCmd.Run(); err != nil {
-		return nil, errors.Wrap(err, "execute: Build command failed")
+		return nil, err
 	}
 
 	buildRes := buildCmd.CommandResult()
 
-	var binID *fssvc.Id
+	if buildRes.Status != 0 {
+		return &svc.CompileResult{
+			Result: buildRes,
+		}, nil
+	}
 
-	// FIXME refactor Put to return id
-	if buildRes.Status == 0 {
-		err = filestore.Put([]string{binFile}, config.FilestoreConfig)
+	binID, err := filestore.Put([]string{binFile}, config.FilestoreConfig)
+	if err != nil {
+		return nil, err
 	}
 
 	return &svc.CompileResult{

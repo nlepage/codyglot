@@ -2,7 +2,6 @@ package filestore
 
 import (
 	"context"
-	"fmt"
 	"os"
 
 	service "github.com/nlepage/codyglot/service/filestore"
@@ -12,8 +11,10 @@ import (
 // FIXME log should log on stderr
 
 // Put puts files to a store server
-func Put(files []string, config ClientConfig) error {
-	return request(func(client service.FileStoreClient) error {
+func Put(files []string, config ClientConfig) (*service.Id, error) {
+	var id *service.Id
+
+	err := request(func(client service.FileStoreClient) error {
 		// FIXME wrap errors
 
 		req, err := client.Put(context.Background())
@@ -43,8 +44,10 @@ func Put(files []string, config ClientConfig) error {
 			return err
 		}
 
-		fmt.Println(res.Id)
+		id = res
 
 		return nil
 	}, config)
+
+	return id, err
 }
