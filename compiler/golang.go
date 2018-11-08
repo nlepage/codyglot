@@ -33,7 +33,7 @@ func (config Golang) compile(ctx context.Context, srcId *fssvc.Id) (*svc.Compile
 
 	binFile := tmpDir.Join("main")
 
-	buildCmd := exec.Command(ctx, "go", "build", "-o", binFile, srcDir).WithDir(tmpDir.Path())
+	buildCmd := exec.Command(ctx, "go", "build", "-o", binFile).WithDir(srcDir)
 
 	if err = buildCmd.Run(); err != nil {
 		return nil, err
