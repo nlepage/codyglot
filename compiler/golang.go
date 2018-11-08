@@ -10,10 +10,10 @@ import (
 	fssvc "github.com/nlepage/codyglot/service/filestore"
 )
 
-type Golang Config
+type Golang ServerConfig
 
 func (config Golang) Server() *Server {
-	return &Server{config.compile, Config(config)}
+	return &Server{config.compile, ServerConfig(config)}
 }
 
 func (config Golang) compile(ctx context.Context, srcId *fssvc.Id) (*svc.CompileResult, error) {
@@ -27,7 +27,7 @@ func (config Golang) compile(ctx context.Context, srcId *fssvc.Id) (*svc.Compile
 
 	srcDir := tmpDir.Join("src")
 
-	if err := filestore.Get(srcId.Id, srcDir, config.FilestoreConfig); err != nil {
+	if err := filestore.Get(srcId.Id, srcDir, config.Filestore); err != nil {
 		return nil, err
 	}
 
@@ -47,7 +47,7 @@ func (config Golang) compile(ctx context.Context, srcId *fssvc.Id) (*svc.Compile
 		}, nil
 	}
 
-	binID, err := filestore.Put([]string{binFile}, config.FilestoreConfig)
+	binID, err := filestore.Put([]string{binFile}, config.Filestore)
 	if err != nil {
 		return nil, err
 	}

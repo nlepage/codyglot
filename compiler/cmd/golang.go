@@ -5,18 +5,14 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var (
-	config compiler.Config
+var config compiler.ServerConfig
 
-	golangCmd = &cobra.Command{
+func init() {
+	addCommand(&cobra.Command{
 		Use:   "golang",
 		Short: "Start Codyglot Go(lang) compiler",
 		RunE: func(_ *cobra.Command, _ []string) error {
 			return compiler.Golang(config).Server().Serve()
 		},
-	}
-)
-
-func init() {
-	addCommand(golangCmd, &config)
+	}, &config)
 }

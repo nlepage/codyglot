@@ -5,7 +5,7 @@ const (
 	DefaultChunkSize = 4000000
 
 	// DefaultHost is the default file store server host
-	DefaultHost = "localhost"
+	DefaultHost = "filestore"
 
 	// DefaultPort is the default file store server port
 	DefaultPort = 9090

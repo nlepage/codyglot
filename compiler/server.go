@@ -15,27 +15,27 @@ import (
 // Server is a struct implementing CompilerServer as a specific compiler
 type Server struct {
 	fn     func(context.Context, *fssvc.Id) (*svc.CompileResult, error)
-	config Config
+	config ServerConfig
 }
 
 // Compile calls Server.fn
-func (c *Server) Compile(ctx context.Context, fsID *fssvc.Id) (*svc.CompileResult, error) {
-	return c.fn(ctx, fsID)
+func (s *Server) Compile(ctx context.Context, fsID *fssvc.Id) (*svc.CompileResult, error) {
+	return s.fn(ctx, fsID)
 }
 
 var _ svc.CompilerServer = (*Server)(nil)
 
 // Serve starts listening for gRPC requests
-func (c *Server) Serve() error {
-	log.Infoln("Starting compiler on port", c.config.Port)
+func (s *Server) Serve() error {
+	log.Infoln("Starting compiler on port", s.config.Port)
 
-	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", c.config.Port))
+	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", s.config.Port))
 	if err != nil {
 		return errors.Wrap(err, "Server: Failed to listen")
 	}
 
 	grpcSrv := grpc.NewServer()
-	svc.RegisterCompilerServer(grpcSrv, c)
+	svc.RegisterCompilerServer(grpcSrv, s)
 	if err := grpcSrv.Serve(lis); err != nil {
 		return errors.Wrap(err, "Server: Failed to serve")
 	}

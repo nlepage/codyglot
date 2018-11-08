@@ -9,9 +9,14 @@ const (
 	DefaultPort = 9090
 )
 
-type Config struct {
+type ServerConfig struct {
 	// Port is the listening port of filestore server
 	Port int
 
-	FilestoreConfig filestore.ClientConfig
+	Filestore filestore.ClientConfig
+}
+
+type ClientConfig struct {
+	Host string
+	Port int
 }

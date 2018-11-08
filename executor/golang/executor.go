@@ -2,6 +2,11 @@ package golang
 
 import (
 	"context"
+	"github.com/nlepage/codyglot/compiler"
+	"github.com/nlepage/codyglot/executor/config"
+	"os"
+
+	"github.com/nlepage/codyglot/filestore"
 
 	"github.com/nlepage/codyglot/exec"
 	"github.com/nlepage/codyglot/executor"
@@ -35,26 +40,35 @@ func execute(ctx context.Context, req *service.ExecuteRequest) (*service.Execute
 		return nil, err
 	}
 
-	binFile := tmpDir.Join("main")
-
-	buildCmd := exec.Command(ctx, "go", "build", "-o", binFile, ".").WithDir(tmpDir.Path())
-
-	if err = buildCmd.Run(); err != nil {
-		return nil, errors.Wrap(err, "execute: Build command failed")
+	files, err := listFiles(tmpDir)
+	if err != nil {
+		return nil, err
 	}
 
-	buildRes := buildCmd.CommandResult()
+	srcID, err := filestore.Put(files, config.Filestore)
+	if err != nil {
+		return nil, err
+	}
 
-	if buildRes.Status != 0 {
+	buildRes, err := compiler.Compile(ctx, srcID, config.Compiler)
+	if err != nil {
+		return nil, err
+	}
+
+	if buildRes.Result.Status != 0 {
 		return &service.ExecuteResponse{
-			Compilation: buildRes,
+			Compilation: buildRes.Result,
 		}, nil
+	}
+
+	if err := filestore.Get(buildRes.FileStoreId.Id, tmpDir.Path(), config.Filestore); err != nil {
+		return nil, err
 	}
 
 	execRes := make([]*service.CommandResult, 0, len(req.Executions))
 
 	for _, execReq := range req.Executions {
-		runCmd := exec.Command(ctx, binFile).WithStdin(execReq.Stdin)
+		runCmd := exec.Command(ctx, tmpDir.Join("main")).WithStdin(execReq.Stdin)
 
 		if err := runCmd.Run(); err != nil {
 			return nil, errors.Wrap(err, "execute: Run command failed")
@@ -64,7 +78,25 @@ func execute(ctx context.Context, req *service.ExecuteRequest) (*service.Execute
 	}
 
 	return &service.ExecuteResponse{
-		Compilation: buildRes,
+		Compilation: buildRes.Result,
 		Executions:  execRes,
 	}, nil
+}
+
+func listFiles(tmpDir *ioutil.TmpDir) ([]string, error) {
+	f, err := os.Open(tmpDir.Path())
+	if err != nil {
+		return nil, err
+	}
+
+	files, err := f.Readdirnames(0)
+	if err != nil {
+		return nil, err
+	}
+
+	for i, f := range files {
+		files[i] = tmpDir.Join(f)
+	}
+
+	return  files, nil
 }

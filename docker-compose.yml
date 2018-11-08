@@ -25,11 +25,22 @@ services:
       - "9090"
 
   golang:
-    build: executor/golang
-    image: nlepage/codyglot:golang
+    build: .
+    image: nlepage/codyglot:base
     read_only: true
     tmpfs:
       - /tmp:exec
+    command: ["executor", "golang", "--compiler-host", "compiler-golang"]
+    expose:
+      - "9090"
+  
+  compiler-golang:
+    build: golang
+    image: nlepage/codyglot:golang
+    read_only: true
+    tmpfs:
+      - /tmp
+    command: ["compiler", "golang"]
     expose:
       - "9090"
 
@@ -39,5 +50,15 @@ services:
     read_only: true
     tmpfs:
       - /tmp
+    expose:
+      - "9090"
+
+  filestore:
+    build: .
+    image: nlepage/codyglot:base
+    read_only: true
+    volumes:
+      - /var/codyglot/filestore
+    command: ["filestore", "server"]
     expose:
       - "9090"
