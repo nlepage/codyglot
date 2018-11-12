@@ -1,15 +1,13 @@
-package nodejs
+package executor
 
 import (
 	"context"
 
 	"github.com/nlepage/codyglot/compiler"
-	"github.com/nlepage/codyglot/filestore"
 	"github.com/nlepage/codyglot/exec"
-	"github.com/nlepage/codyglot/executor"
+	"github.com/nlepage/codyglot/filestore"
 	"github.com/nlepage/codyglot/ioutil"
 	svc "github.com/nlepage/codyglot/service"
-	"github.com/nlepage/codyglot/executor/config"
 	"github.com/pkg/errors"
 )
 
@@ -18,17 +16,19 @@ const (
 	typescript = "typescript"
 )
 
+type NodeJS Config
+
 // Executor returns NodeJS Executor
-func Executor() *executor.Executor {
-	return executor.New(execute, []string{javascript, typescript})
+func (config NodeJS) Executor() *Executor {
+	return New(Config(config), config.execute, []string{javascript, typescript})
 }
 
-func execute(ctx context.Context, req *svc.ExecuteRequest) (*svc.ExecuteResponse, error) {
+func (config NodeJS) execute(ctx context.Context, req *svc.ExecuteRequest) (*svc.ExecuteResponse, error) {
 	switch req.Language {
 	case javascript:
-		return executeJavascript(ctx, req)
+		return config.executeJavascript(ctx, req)
 	case typescript:
-		return executeTypescript(ctx, req)
+		return config.executeTypescript(ctx, req)
 	default:
 		return nil, errors.Errorf("execute: Unsupported language %s", req.Language)
 	}
@@ -36,7 +36,7 @@ func execute(ctx context.Context, req *svc.ExecuteRequest) (*svc.ExecuteResponse
 
 // FIXME wrap errors
 
-func executeJavascript(ctx context.Context, req *svc.ExecuteRequest) (*svc.ExecuteResponse, error) {
+func (config NodeJS) executeJavascript(ctx context.Context, req *svc.ExecuteRequest) (*svc.ExecuteResponse, error) {
 	tmpDir, err := ioutil.NewTmpDir()
 	if err != nil {
 		return nil, err
@@ -64,7 +64,7 @@ func executeJavascript(ctx context.Context, req *svc.ExecuteRequest) (*svc.Execu
 	}, nil
 }
 
-func executeTypescript(ctx context.Context, req *svc.ExecuteRequest) (*svc.ExecuteResponse, error) {
+func (config NodeJS) executeTypescript(ctx context.Context, req *svc.ExecuteRequest) (*svc.ExecuteResponse, error) {
 	tmpDir, err := ioutil.NewTmpDir()
 	if err != nil {
 		return nil, err

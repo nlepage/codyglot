@@ -6,7 +6,7 @@ import (
 	"strconv"
 	"time"
 
-	executor_config "github.com/nlepage/codyglot/executor/config"
+	executor_config "github.com/nlepage/codyglot/executor"
 	"github.com/nlepage/codyglot/router/server/config"
 	"github.com/nlepage/codyglot/service"
 	"github.com/pkg/errors"

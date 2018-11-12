@@ -1,4 +1,4 @@
-package config
+package executor
 
 import (
 	"github.com/nlepage/codyglot/compiler"
@@ -12,11 +12,11 @@ const (
 	DefaultCompilerHost = "localhost" // FIXME correct value
 )
 
-var (
+type Config struct {
 	// Port is the executor listening port
 	Port int
 
 	Compiler compiler.ClientConfig
 
 	Filestore filestore.ClientConfig
-)
+}

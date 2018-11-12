@@ -1,31 +1,26 @@
-package golang
+package executor
 
 import (
 	"context"
+
 	"github.com/nlepage/codyglot/compiler"
-	"github.com/nlepage/codyglot/executor/config"
-
-	"github.com/nlepage/codyglot/filestore"
-
 	"github.com/nlepage/codyglot/exec"
-	"github.com/nlepage/codyglot/executor"
+	"github.com/nlepage/codyglot/filestore"
 	"github.com/nlepage/codyglot/ioutil"
 	"github.com/nlepage/codyglot/service"
 	"github.com/pkg/errors"
 )
 
-const (
-	language = "golang"
-)
+const golang = "golang"
 
-// Executor returns Golang Executor
-func Executor() *executor.Executor {
-	return executor.New(execute, []string{language})
+type Golang Config
+
+func (config Golang) Executor() *Executor {
+	return New(Config(config), config.execute, []string{golang})
 }
 
-// Execute executes Go(lang) code
-func execute(ctx context.Context, req *service.ExecuteRequest) (*service.ExecuteResponse, error) {
-	if req.Language != language {
+func (config Golang) execute(ctx context.Context, req *service.ExecuteRequest) (*service.ExecuteResponse, error) {
+	if req.Language != golang {
 		return nil, errors.Errorf("execute: Unsupported language %s", req.Language)
 	}
 

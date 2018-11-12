@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"net"
 
-	config "github.com/nlepage/codyglot/executor/config"
 	"github.com/nlepage/codyglot/ping"
 	"github.com/nlepage/codyglot/service"
 	"github.com/pkg/errors"
@@ -15,14 +14,15 @@ import (
 
 // Executor is a struct implementing CodyglotServer as a specific executor
 type Executor struct {
+	config Config
 	*ping.Server
 	fn        func(context.Context, *service.ExecuteRequest) (*service.ExecuteResponse, error)
 	languages []string
 }
 
 // New creates a new Executor
-func New(fn func(context.Context, *service.ExecuteRequest) (*service.ExecuteResponse, error), languages []string) *Executor {
-	return &Executor{&ping.Server{}, fn, languages}
+func New(config Config, fn func(context.Context, *service.ExecuteRequest) (*service.ExecuteResponse, error), languages []string) *Executor {
+	return &Executor{config, &ping.Server{}, fn, languages}
 }
 
 // Execute calls Executor.fn
@@ -39,9 +39,9 @@ var _ service.CodyglotServer = (*Executor)(nil)
 
 // Serve starts listening for gRPC requests
 func (e *Executor) Serve() error {
-	log.Infoln("Starting executor on port", config.Port)
+	log.Infoln("Starting executor on port", e.config.Port)
 
-	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", config.Port))
+	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", e.config.Port))
 	if err != nil {
 		return errors.Wrap(err, "Executor: Failed to listen")
 	}
