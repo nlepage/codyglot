@@ -4,4 +4,3 @@ dist/
 node_modules/
 *.pb.go
 *.pb.gw.go
-*.swagger.json

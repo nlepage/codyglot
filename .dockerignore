@@ -9,3 +9,5 @@ codyglot
 docker-compose.yml
 **/README.md
 **/Dockerfile
+**/*.pb.go
+**/*.pb.gw.go

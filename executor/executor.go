@@ -6,18 +6,12 @@ import (
 	"net"
 
 	config "github.com/nlepage/codyglot/executor/config"
-	"github.com/nlepage/codyglot/executor/tmputil"
 	"github.com/nlepage/codyglot/ping"
 	"github.com/nlepage/codyglot/service"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
 )
-
-// Init initializes the executor
-func Init() {
-	tmputil.StartCleanup()
-}
 
 // Executor is a struct implementing CodyglotServer as a specific executor
 type Executor struct {

@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+package com.github.nlepage.codyglot.service.compiler;
+option go_package = "github.com/nlepage/codyglot/service/compiler";
+
+import "service/common.proto";
+import "service/filestore.proto";
+
+message CompileResult {
+  com.github.nlepage.codyglot.service.CommandResult result = 1;
+  com.github.nlepage.codyglot.service.filestore.Id fileStoreId = 2;
+}
+
+service Compiler {
+  rpc Compile(com.github.nlepage.codyglot.service.filestore.Id) returns (CompileResult) {}
+}

@@ -2,10 +2,14 @@ package golang
 
 import (
 	"context"
+	"github.com/nlepage/codyglot/compiler"
+	"github.com/nlepage/codyglot/executor/config"
 
+	"github.com/nlepage/codyglot/filestore"
+
+	"github.com/nlepage/codyglot/exec"
 	"github.com/nlepage/codyglot/executor"
-	"github.com/nlepage/codyglot/executor/executil"
-	"github.com/nlepage/codyglot/executor/tmputil"
+	"github.com/nlepage/codyglot/ioutil"
 	"github.com/nlepage/codyglot/service"
 	"github.com/pkg/errors"
 )
@@ -25,36 +29,45 @@ func execute(ctx context.Context, req *service.ExecuteRequest) (*service.Execute
 		return nil, errors.Errorf("execute: Unsupported language %s", req.Language)
 	}
 
-	tmpDir, err := tmputil.NewTmpDir()
+	tmpDir, err := ioutil.NewTmpDir()
 	if err != nil {
 		return nil, err
 	}
 	defer tmpDir.Close()
 
-	if err = tmpDir.WriteSources(req.Sources); err != nil {
+	if err = ioutil.WriteSources(tmpDir.Path(), req.Sources); err != nil {
 		return nil, err
 	}
 
-	binFile := tmpDir.Join("main")
-
-	buildCmd := executil.Command(ctx, "go", "build", "-o", binFile, ".").WithDir(tmpDir.Path())
-
-	if err = buildCmd.Run(); err != nil {
-		return nil, errors.Wrap(err, "execute: Build command failed")
+	files, err := ioutil.ListFiles(tmpDir.Path())
+	if err != nil {
+		return nil, err
 	}
 
-	buildRes := buildCmd.CommandResult()
+	srcID, err := filestore.Put(files, config.Filestore)
+	if err != nil {
+		return nil, err
+	}
 
-	if buildRes.Status != 0 {
+	buildRes, err := compiler.Compile(ctx, srcID, config.Compiler)
+	if err != nil {
+		return nil, err
+	}
+
+	if buildRes.Result.Status != 0 {
 		return &service.ExecuteResponse{
-			Compilation: buildRes,
+			Compilation: buildRes.Result,
 		}, nil
+	}
+
+	if err := filestore.Get(buildRes.FileStoreId.Id, tmpDir.Path(), config.Filestore); err != nil {
+		return nil, err
 	}
 
 	execRes := make([]*service.CommandResult, 0, len(req.Executions))
 
 	for _, execReq := range req.Executions {
-		runCmd := executil.Command(ctx, binFile).WithStdin(execReq.Stdin)
+		runCmd := exec.Command(ctx, tmpDir.Join("main")).WithStdin(execReq.Stdin)
 
 		if err := runCmd.Run(); err != nil {
 			return nil, errors.Wrap(err, "execute: Run command failed")
@@ -64,7 +77,7 @@ func execute(ctx context.Context, req *service.ExecuteRequest) (*service.Execute
 	}
 
 	return &service.ExecuteResponse{
-		Compilation: buildRes,
+		Compilation: buildRes.Result,
 		Executions:  execRes,
 	}, nil
 }
