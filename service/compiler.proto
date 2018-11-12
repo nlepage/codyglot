@@ -14,4 +14,3 @@ message CompileResult {
 service Compiler {
   rpc Compile(com.github.nlepage.codyglot.service.filestore.Id) returns (CompileResult) {}
 }
-  

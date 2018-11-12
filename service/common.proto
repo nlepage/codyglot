@@ -8,4 +8,4 @@ message CommandResult {
     string stdout = 2; // Standard output
     string stderr = 3; // Standard error output
     int64 duration = 4; // Running duration
-  }
+}

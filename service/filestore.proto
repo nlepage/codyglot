@@ -27,4 +27,3 @@ service FileStore {
   rpc Put(stream FileMessage) returns (Id) {}
   rpc Get(Id) returns (stream FileMessage) {}
 }
-  
