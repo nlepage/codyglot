@@ -3,10 +3,13 @@ package nodejs
 import (
 	"context"
 
+	"github.com/nlepage/codyglot/compiler"
+	"github.com/nlepage/codyglot/filestore"
 	"github.com/nlepage/codyglot/exec"
 	"github.com/nlepage/codyglot/executor"
 	"github.com/nlepage/codyglot/ioutil"
-	"github.com/nlepage/codyglot/service"
+	svc "github.com/nlepage/codyglot/service"
+	"github.com/nlepage/codyglot/executor/config"
 	"github.com/pkg/errors"
 )
 
@@ -20,7 +23,7 @@ func Executor() *executor.Executor {
 	return executor.New(execute, []string{javascript, typescript})
 }
 
-func execute(ctx context.Context, req *service.ExecuteRequest) (*service.ExecuteResponse, error) {
+func execute(ctx context.Context, req *svc.ExecuteRequest) (*svc.ExecuteResponse, error) {
 	switch req.Language {
 	case javascript:
 		return executeJavascript(ctx, req)
@@ -33,18 +36,18 @@ func execute(ctx context.Context, req *service.ExecuteRequest) (*service.Execute
 
 // FIXME wrap errors
 
-func executeJavascript(ctx context.Context, req *service.ExecuteRequest) (*service.ExecuteResponse, error) {
+func executeJavascript(ctx context.Context, req *svc.ExecuteRequest) (*svc.ExecuteResponse, error) {
 	tmpDir, err := ioutil.NewTmpDir()
 	if err != nil {
 		return nil, err
 	}
 	defer tmpDir.Close()
 
-	if err = tmpDir.WriteSources(req.Sources); err != nil {
+	if err = ioutil.WriteSources(tmpDir.Path(), req.Sources); err != nil {
 		return nil, err
 	}
 
-	execResults := make([]*service.CommandResult, 0, len(req.Executions))
+	execResults := make([]*svc.CommandResult, 0, len(req.Executions))
 
 	for _, execReq := range req.Executions {
 		cmd := exec.Command(ctx, "node", tmpDir.Path()).WithStdin(execReq.Stdin)
@@ -56,52 +59,55 @@ func executeJavascript(ctx context.Context, req *service.ExecuteRequest) (*servi
 		execResults = append(execResults, cmd.CommandResult())
 	}
 
-	return &service.ExecuteResponse{
+	return &svc.ExecuteResponse{
 		Executions: execResults,
 	}, nil
 }
 
-func executeTypescript(ctx context.Context, req *service.ExecuteRequest) (*service.ExecuteResponse, error) {
+func executeTypescript(ctx context.Context, req *svc.ExecuteRequest) (*svc.ExecuteResponse, error) {
 	tmpDir, err := ioutil.NewTmpDir()
 	if err != nil {
 		return nil, err
 	}
 	defer tmpDir.Close()
 
-	if err = tmpDir.WriteSources(req.Sources); err != nil {
+	srcDir := tmpDir.Join("src")
+
+	if err = ioutil.WriteSources(srcDir, req.Sources); err != nil {
 		return nil, err
 	}
 
-	initCmd := exec.Command(ctx, "tsc", "--init").WithDir(tmpDir.Path())
-
-	if err = initCmd.Run(); err != nil {
-		return nil, errors.Wrap(err, "execute: Init command failed")
+	srcFiles, err := ioutil.ListFiles(srcDir)
+	if err != nil {
+		return nil, err
 	}
 
-	if initRes := initCmd.CommandResult(); initRes.Status != 0 {
-		return &service.ExecuteResponse{
-			Compilation: initRes,
+	srcID, err := filestore.Put(srcFiles, config.Filestore)
+	if err != nil {
+		return nil, err
+	}
+
+	compileRes, err := compiler.Compile(ctx, srcID, config.Compiler)
+	if err != nil {
+		return nil, err
+	}
+
+	if compileRes.Result.Status != 0 {
+		return &svc.ExecuteResponse{
+			Compilation: compileRes.Result,
 		}, nil
 	}
 
-	compileCmd := exec.Command(ctx, "tsc").WithDir(tmpDir.Path())
+	outDir := tmpDir.Join("out")
 
-	if err = compileCmd.Run(); err != nil {
-		return nil, errors.Wrap(err, "execute: Compile command failed")
+	if err := filestore.Get(compileRes.FileStoreId.Id, outDir, config.Filestore); err != nil {
+		return nil, err
 	}
 
-	compileRes := compileCmd.CommandResult()
-
-	if compileRes.Status != 0 {
-		return &service.ExecuteResponse{
-			Compilation: compileRes,
-		}, nil
-	}
-
-	execRes := make([]*service.CommandResult, 0, len(req.Executions))
+	execRes := make([]*svc.CommandResult, 0, len(req.Executions))
 
 	for _, execReq := range req.Executions {
-		runCmd := exec.Command(ctx, "node", tmpDir.Path()).WithStdin(execReq.Stdin)
+		runCmd := exec.Command(ctx, "node", outDir).WithStdin(execReq.Stdin)
 
 		if err = runCmd.Run(); err != nil {
 			return nil, errors.Wrap(err, "execute: Run command failed")
@@ -110,8 +116,8 @@ func executeTypescript(ctx context.Context, req *service.ExecuteRequest) (*servi
 		execRes = append(execRes, runCmd.CommandResult())
 	}
 
-	return &service.ExecuteResponse{
-		Compilation: compileRes,
+	return &svc.ExecuteResponse{
+		Compilation: compileRes.Result,
 		Executions:  execRes,
 	}, nil
 }

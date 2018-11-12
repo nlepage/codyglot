@@ -4,7 +4,6 @@ import (
 	"context"
 	"github.com/nlepage/codyglot/compiler"
 	"github.com/nlepage/codyglot/executor/config"
-	"os"
 
 	"github.com/nlepage/codyglot/filestore"
 
@@ -36,11 +35,11 @@ func execute(ctx context.Context, req *service.ExecuteRequest) (*service.Execute
 	}
 	defer tmpDir.Close()
 
-	if err = tmpDir.WriteSources(req.Sources); err != nil {
+	if err = ioutil.WriteSources(tmpDir.Path(), req.Sources); err != nil {
 		return nil, err
 	}
 
-	files, err := listFiles(tmpDir)
+	files, err := ioutil.ListFiles(tmpDir.Path())
 	if err != nil {
 		return nil, err
 	}
@@ -81,22 +80,4 @@ func execute(ctx context.Context, req *service.ExecuteRequest) (*service.Execute
 		Compilation: buildRes.Result,
 		Executions:  execRes,
 	}, nil
-}
-
-func listFiles(tmpDir *ioutil.TmpDir) ([]string, error) {
-	f, err := os.Open(tmpDir.Path())
-	if err != nil {
-		return nil, err
-	}
-
-	files, err := f.Readdirnames(0)
-	if err != nil {
-		return nil, err
-	}
-
-	for i, f := range files {
-		files[i] = tmpDir.Join(f)
-	}
-
-	return  files, nil
 }

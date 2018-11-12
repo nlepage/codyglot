@@ -5,11 +5,9 @@ import (
 	"io/ioutil"
 	"os"
 	"path"
-	"path/filepath"
 	"sync"
 
 	"github.com/nlepage/codyglot/config"
-	"github.com/nlepage/codyglot/service"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 )
@@ -57,6 +55,11 @@ func NewTmpDir() (*TmpDir, error) {
 	}, nil
 }
 
+// Path returns the path of the TmpDir
+func (td *TmpDir) Path() string {
+	return td.path
+}
+
 // Join joins sub paths to the path of TmpDir
 func (td *TmpDir) Join(paths ...string) string {
 	td.checkClosed("Join")
@@ -67,32 +70,6 @@ func (td *TmpDir) Join(paths ...string) string {
 	return path.Join(fullPaths...)
 }
 
-// WriteFile writes a file in TmpDir
-func (td *TmpDir) WriteFile(name string, content string) (string, error) {
-	td.checkClosed("WriteFile")
-
-	p := td.Join(name)
-
-	f, err := os.Create(p)
-	if err != nil {
-		return "", errors.Wrap(err, "TmpDir: Failed to create file")
-	}
-	defer f.Close()
-
-	_, err = f.WriteString(content)
-	if err != nil {
-		return "", errors.Wrap(err, "TmpDir: Failed to write file")
-	}
-
-	return p, nil
-}
-
-func (td *TmpDir) checkClosed(name string) {
-	if td.closed {
-		panic(fmt.Sprintf("TmpDir: Invalid state, %s should not be called after closing temp dir", name))
-	}
-}
-
 // Close marks the TmpDir closed and sends it to cleanup routines
 func (td *TmpDir) Close() {
 	td.checkClosed("Close")
@@ -101,23 +78,8 @@ func (td *TmpDir) Close() {
 	closed <- td.path
 }
 
-// Path returns the path of the TmpDir
-func (td *TmpDir) Path() string {
-	return td.path
-}
-
-// WriteSources writes source files to the TmpDir
-func (td *TmpDir) WriteSources(sources []*service.SourceFile) error {
-	for _, srcFile := range sources {
-		if err := os.MkdirAll(filepath.Dir(td.Join(srcFile.Path)), 0755); err != nil {
-			return errors.Wrap(err, "execute: Failed to create directory")
-		}
-
-		if _, err := td.WriteFile(srcFile.Path, srcFile.Content); err != nil {
-			// FIXME format error with file information
-			return errors.Wrap(err, "execute: Failed to write source file")
-		}
+func (td *TmpDir) checkClosed(name string) {
+	if td.closed {
+		panic(fmt.Sprintf("TmpDir: Invalid state, %s should not be called after closing temp dir", name))
 	}
-
-	return nil
 }

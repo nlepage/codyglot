@@ -45,11 +45,22 @@ services:
       - "9090"
 
   nodejs:
-    build: executor/nodejs
+    build: nodejs
     image: nlepage/codyglot:nodejs
     read_only: true
     tmpfs:
       - /tmp
+    command: ["executor", "nodejs", "--compiler-host", "compiler-typescript"]
+    expose:
+      - "9090"
+
+  compiler-typescript:
+    build: nodejs
+    image: nlepage/codyglot:nodejs
+    read_only: true
+    tmpfs:
+      - /tmp
+    command: ["compiler", "typescript"]
     expose:
       - "9090"
 

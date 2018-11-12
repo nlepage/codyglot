@@ -7,21 +7,22 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// Compiler is the compiler command group
-var Compiler = &cobra.Command{
-	Short: "Codyglot compilers",
-	Use:   "compiler",
-}
+var (
+	compilerCmd = &cobra.Command{
+		Short: "Codyglot compilers",
+		Use:   "compiler",
+	}
+	config compiler.ServerConfig
+)
 
 func init() {
-	cmd.Cmd.AddCommand(Compiler)
+	cmd.Cmd.AddCommand(compilerCmd)
 }
 
-// FIXME bind filestore client config
 func addCommand(_cmd *cobra.Command, config *compiler.ServerConfig) {
-	Compiler.Flags().IntVarP(&config.Port, "port", "p", compiler.DefaultPort, "Listening port")
-	Compiler.Flags().StringVar(&config.Filestore.Host, "filestore-host", filestore.DefaultHost, "Filestore host")
-	Compiler.Flags().IntVar(&config.Filestore.Port, "filestore-port", filestore.DefaultPort, "Filestore port")
-	Compiler.Flags().IntVar(&config.Filestore.ChunkSize, "filestore-chunk-size", filestore.DefaultChunkSize, "Filestore chunk size")
-	Compiler.AddCommand(_cmd)
+	_cmd.Flags().IntVarP(&config.Port, "port", "p", compiler.DefaultPort, "Listening port")
+	_cmd.Flags().StringVar(&config.Filestore.Host, "filestore-host", filestore.DefaultHost, "Filestore host")
+	_cmd.Flags().IntVar(&config.Filestore.Port, "filestore-port", filestore.DefaultPort, "Filestore port")
+	_cmd.Flags().IntVar(&config.Filestore.ChunkSize, "filestore-chunk-size", filestore.DefaultChunkSize, "Filestore chunk size")
+	compilerCmd.AddCommand(_cmd)
 }

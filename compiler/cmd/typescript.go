@@ -7,10 +7,10 @@ import (
 
 func init() {
 	addCommand(&cobra.Command{
-		Use:   "golang",
-		Short: "Start Codyglot Go(lang) compiler",
+		Use:   "typescript",
+		Short: "Start Codyglot TypeScript compiler",
 		RunE: func(_ *cobra.Command, _ []string) error {
-			return compiler.Golang(config).Server().Serve()
+			return compiler.TypeScript(config).Server().Serve()
 		},
 	}, &config)
 }
