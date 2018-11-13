@@ -5,6 +5,7 @@ services:
   repl:
     build: repl
     image: nlepage/codyglot:repl
+    read_only: true
     ports:
       - "80"
 
@@ -14,6 +15,14 @@ services:
     read_only: true
     command: ["router", "gateway", "-e", "router:9090"]
     expose:
+      - "8080"
+  
+  graphql:
+    build: .
+    image: nlepage/codyglot:base
+    read_only: true
+    command: ["graphql", "--playground"]
+    ports:
       - "8080"
 
   router:

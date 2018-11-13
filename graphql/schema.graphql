@@ -1,0 +1,25 @@
+input ExecutionInput {
+    stdin: String!
+}
+
+input FileInput {
+    path: String!
+    content: String!
+}
+
+type CommandResult {
+    status: Int!
+    stdout: String!
+    stderr: String!
+    duration: Int!
+}
+
+type ExecuteResponse {
+    compilation: CommandResult
+    executions: [CommandResult]!
+}
+
+type Query {
+    executeSnippet(language: String!, snippet: String!, executions: [ExecutionInput!]!): ExecuteResponse
+    executeSources(language: String!, sources: [FileInput!]!, executions: [ExecutionInput!]!): ExecuteResponse
+}
