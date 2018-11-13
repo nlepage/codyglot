@@ -2,13 +2,6 @@ version: "3"
 
 services:
 
-  repl:
-    build: repl
-    image: nlepage/codyglot:repl
-    read_only: true
-    ports:
-      - "80"
-
   gateway:
     build: .
     image: nlepage/codyglot:base
