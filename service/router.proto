@@ -3,22 +3,12 @@ syntax = "proto3";
 package com.github.nlepage.codyglot.service;
 option go_package = "github.com/nlepage/codyglot/service";
 
-import "google/api/annotations.proto";
 import "service/common.proto";
 
 service Codyglot {
-  rpc execute(ExecuteRequest) returns (ExecuteResponse) {
-    option (google.api.http) = {
-      post: "/execute"
-      body: "*"
-    };
-  }
+  rpc execute(ExecuteRequest) returns (ExecuteResponse) {}
 
-  rpc languages(LanguagesRequest) returns (LanguagesResponse) {
-    option (google.api.http) = {
-      get: "/languages"
-    };
-  }
+  rpc languages(LanguagesRequest) returns (LanguagesResponse) {}
 
   rpc ping(Ping) returns (Pong) {}
 }

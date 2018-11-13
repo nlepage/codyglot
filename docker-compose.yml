@@ -2,14 +2,6 @@ version: "3"
 
 services:
 
-  gateway:
-    build: .
-    image: nlepage/codyglot:base
-    read_only: true
-    command: ["router", "gateway", "-e", "router:9090"]
-    expose:
-      - "8080"
-  
   graphql:
     build: .
     image: nlepage/codyglot:base

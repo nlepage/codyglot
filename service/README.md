@@ -1,3 +1,5 @@
+⚠ This README is outdated
+
 ### Install
 See [gRPC setup](../docs/GRPC_SETUP.md)
 
