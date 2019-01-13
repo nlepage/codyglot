@@ -4,7 +4,6 @@ import (
 	"context"
 
 	service "github.com/nlepage/codyglot/service/filestore"
-	log "github.com/sirupsen/logrus"
 )
 
 // FIXME log should log on stderr
@@ -21,10 +20,8 @@ func Put(paths []string, config ClientConfig) (*service.Id, error) {
 			return err
 		}
 
-		for _, path := range paths {
-			if err := send(req, FsReader(path, config.Config, true)); err != nil {
-				log.WithError(err).Errorf("Error while walking putting path %s", path)
-			}
+		if err := send(req, FsReader(paths, config.Config, true)); err != nil {
+			return err
 		}
 
 		res, err := req.CloseAndRecv()

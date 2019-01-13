@@ -33,12 +33,12 @@ type Reader interface {
 	Copy(Writer) error
 }
 
-func FsReader(path string, config Config, includeDirName bool) Reader {
-	return fsReader{path, config, includeDirName}
+func FsReader(paths []string, config Config, includeDirName bool) Reader {
+	return fsReader{paths, config, includeDirName}
 }
 
 type fsReader struct {
-	path           string
+	paths          []string
 	config         Config
 	includeDirName bool
 }
@@ -47,20 +47,30 @@ var _ Reader = fsReader{}
 
 func (fr fsReader) Copy(w Writer) error {
 	// FIXME wrap errors
-	info, err := os.Stat(fr.path)
-	if err != nil {
-		return err
+
+	for _, path := range fr.paths {
+		info, err := os.Stat(path)
+		if err != nil {
+			return err
+		}
+
+		if info.IsDir() {
+			if err := fr.copyDir(w, path); err != nil {
+				return err
+			}
+			continue
+		}
+
+		if err := fr.copy(w, path, info.Name(), info.Mode()); err != nil {
+			return err
+		}
 	}
 
-	if info.IsDir() {
-		return fr.copyDir(w)
-	}
-
-	return fr.copy(w, fr.path, info.Name(), info.Mode())
+	return nil
 }
 
-func (fr fsReader) copyDir(w Writer) error {
-	dir, err := filepath.Abs(fr.path)
+func (fr fsReader) copyDir(w Writer, path string) error {
+	dir, err := filepath.Abs(path)
 	if err != nil {
 		return err
 	}
