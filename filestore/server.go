@@ -51,7 +51,7 @@ func (s *Server) Put(srv service.FileStore_PutServer) error {
 		return err
 	}
 
-	if err := recv(srv, dir); err != nil {
+	if err := recv(srv, DiskFilesWriter(dir)); err != nil {
 		return err
 	}
 
