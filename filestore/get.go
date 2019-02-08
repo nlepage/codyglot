@@ -6,7 +6,7 @@ import (
 	service "github.com/nlepage/codyglot/service/filestore"
 )
 
-func Get(id string, dir string, config ClientConfig) error {
+func Get(id string, w Writer, config ClientConfig) error {
 	return request(func(client service.FileStoreClient) error {
 		// FIXME wrap errors
 
@@ -15,7 +15,7 @@ func Get(id string, dir string, config ClientConfig) error {
 			return err
 		}
 
-		if err := recv(req, FsWriter(dir)); err != nil {
+		if err := recv(req, w); err != nil {
 			return err
 		}
 

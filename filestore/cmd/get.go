@@ -13,7 +13,7 @@ var (
 		Use:   "get",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(_ *cobra.Command, args []string) error {
-			return filestore.Get(args[0], getConfig.OutputDir, getConfig.ClientConfig)
+			return filestore.Get(args[0], filestore.FsWriter(getConfig.OutputDir), getConfig.ClientConfig)
 		},
 	}
 )

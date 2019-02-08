@@ -15,7 +15,7 @@ var (
 		Use:   "put",
 		Args:  cobra.MinimumNArgs(1),
 		RunE: func(_ *cobra.Command, args []string) error {
-			id, err := filestore.Put(args, putConfig)
+			id, err := filestore.Put(filestore.FsReader(args, putConfig.Config, true), putConfig)
 			if err != nil {
 				return err
 			}

@@ -77,12 +77,7 @@ func (config NodeJS) executeTypescript(ctx context.Context, req *svc.ExecuteRequ
 		return nil, err
 	}
 
-	srcFiles, err := ioutil.ListFiles(srcDir)
-	if err != nil {
-		return nil, err
-	}
-
-	srcID, err := filestore.Put(srcFiles, config.Filestore)
+	srcID, err := filestore.Put(filestore.FsReader([]string{srcDir}, config.Filestore.Config, false), config.Filestore)
 	if err != nil {
 		return nil, err
 	}
@@ -100,7 +95,7 @@ func (config NodeJS) executeTypescript(ctx context.Context, req *svc.ExecuteRequ
 
 	outDir := tmpDir.Join("out")
 
-	if err := filestore.Get(compileRes.FileStoreId.Id, outDir, config.Filestore); err != nil {
+	if err := filestore.Get(compileRes.FileStoreId.Id, filestore.FsWriter(outDir), config.Filestore); err != nil {
 		return nil, err
 	}
 

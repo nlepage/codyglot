@@ -9,7 +9,7 @@ import (
 // FIXME log should log on stderr
 
 // Put puts files to a store server
-func Put(paths []string, config ClientConfig) (*service.Id, error) {
+func Put(r Reader, config ClientConfig) (*service.Id, error) {
 	var id *service.Id
 
 	err := request(func(client service.FileStoreClient) error {
@@ -20,7 +20,7 @@ func Put(paths []string, config ClientConfig) (*service.Id, error) {
 			return err
 		}
 
-		if err := send(req, FsReader(paths, config.Config, true)); err != nil {
+		if err := send(req, r); err != nil {
 			return err
 		}
 

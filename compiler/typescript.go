@@ -27,7 +27,7 @@ func (config TypeScript) compile(ctx context.Context, srcId *fssvc.Id) (*svc.Com
 
 	srcDir := tmpDir.Join("src")
 
-	if err := filestore.Get(srcId.Id, srcDir, config.Filestore); err != nil {
+	if err := filestore.Get(srcId.Id, filestore.FsWriter(srcDir), config.Filestore); err != nil {
 		return nil, err
 	}
 
@@ -59,12 +59,7 @@ func (config TypeScript) compile(ctx context.Context, srcId *fssvc.Id) (*svc.Com
 		}, nil
 	}
 
-	outFiles, err := ioutil.ListFiles(outDir)
-	if err != nil {
-		return nil, err
-	}
-
-	outID, err := filestore.Put(outFiles, config.Filestore)
+	outID, err := filestore.Put(filestore.FsReader([]string{outDir}, config.Filestore.Config, false), config.Filestore)
 	if err != nil {
 		return nil, err
 	}

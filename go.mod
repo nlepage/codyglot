@@ -19,7 +19,7 @@ require (
 	golang.org/x/crypto v0.0.0-20181030102418-4d3f4d9ffa16 // indirect
 	golang.org/x/net v0.0.0-20181029044818-c44066c5c816
 	golang.org/x/sys v0.0.0-20181030150119-7e31e0c00fa0 // indirect
-	google.golang.org/genproto v0.0.0-20181029155118-b69ba1387ce2
+	google.golang.org/genproto v0.0.0-20181029155118-b69ba1387ce2 // indirect
 	google.golang.org/grpc v1.16.0
 	gopkg.in/yaml.v2 v2.2.1 // indirect
 )

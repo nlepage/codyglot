@@ -34,12 +34,7 @@ func (config Golang) execute(ctx context.Context, req *service.ExecuteRequest) (
 		return nil, err
 	}
 
-	files, err := ioutil.ListFiles(tmpDir.Path())
-	if err != nil {
-		return nil, err
-	}
-
-	srcID, err := filestore.Put(files, config.Filestore)
+	srcID, err := filestore.Put(filestore.FsReader([]string{tmpDir.Path()}, config.Filestore.Config, false), config.Filestore)
 	if err != nil {
 		return nil, err
 	}
@@ -55,7 +50,7 @@ func (config Golang) execute(ctx context.Context, req *service.ExecuteRequest) (
 		}, nil
 	}
 
-	if err := filestore.Get(buildRes.FileStoreId.Id, tmpDir.Path(), config.Filestore); err != nil {
+	if err := filestore.Get(buildRes.FileStoreId.Id, filestore.FsWriter(tmpDir.Path()), config.Filestore); err != nil {
 		return nil, err
 	}
 

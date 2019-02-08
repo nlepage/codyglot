@@ -27,7 +27,7 @@ func (config Golang) compile(ctx context.Context, srcId *fssvc.Id) (*svc.Compile
 
 	srcDir := tmpDir.Join("src")
 
-	if err := filestore.Get(srcId.Id, srcDir, config.Filestore); err != nil {
+	if err := filestore.Get(srcId.Id, filestore.FsWriter(srcDir), config.Filestore); err != nil {
 		return nil, err
 	}
 
@@ -47,7 +47,7 @@ func (config Golang) compile(ctx context.Context, srcId *fssvc.Id) (*svc.Compile
 		}, nil
 	}
 
-	binID, err := filestore.Put([]string{binFile}, config.Filestore)
+	binID, err := filestore.Put(filestore.FsReader([]string{binFile}, config.Filestore.Config, false), config.Filestore)
 	if err != nil {
 		return nil, err
 	}
