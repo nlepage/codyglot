@@ -15,7 +15,7 @@ func Get(id string, dir string, config ClientConfig) error {
 			return err
 		}
 
-		if err := recv(req, DiskFilesWriter(dir)); err != nil {
+		if err := recv(req, FsWriter(dir)); err != nil {
 			return err
 		}
 

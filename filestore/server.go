@@ -51,7 +51,7 @@ func (s *Server) Put(srv service.FileStore_PutServer) error {
 		return err
 	}
 
-	if err := recv(srv, DiskFilesWriter(dir)); err != nil {
+	if err := recv(srv, FsWriter(dir)); err != nil {
 		return err
 	}
 
@@ -62,7 +62,7 @@ func (s *Server) Put(srv service.FileStore_PutServer) error {
 func (s *Server) Get(id *service.Id, srv service.FileStore_GetServer) error {
 	// FIXME wrap errors
 
-	return sendDir(srv, filepath.Join(s.Config.Root, id.Id), s.Config.Config, false)
+	return send(srv, FsReader(filepath.Join(s.Config.Root, id.Id), s.Config.Config, false))
 }
 
 var _ service.FileStoreServer = &Server{}

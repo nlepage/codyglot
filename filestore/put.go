@@ -2,7 +2,6 @@ package filestore
 
 import (
 	"context"
-	"os"
 
 	service "github.com/nlepage/codyglot/service/filestore"
 	log "github.com/sirupsen/logrus"
@@ -11,7 +10,7 @@ import (
 // FIXME log should log on stderr
 
 // Put puts files to a store server
-func Put(files []string, config ClientConfig) (*service.Id, error) {
+func Put(paths []string, config ClientConfig) (*service.Id, error) {
 	var id *service.Id
 
 	err := request(func(client service.FileStoreClient) error {
@@ -22,20 +21,9 @@ func Put(files []string, config ClientConfig) (*service.Id, error) {
 			return err
 		}
 
-		for _, file := range files {
-			info, err := os.Stat(file)
-			if err != nil {
-				log.WithError(err).Errorf("Could not determine file type of %s", file)
-			}
-
-			if info.IsDir() {
-				if err := sendDir(req, file, config.Config, true); err != nil {
-					log.WithError(err).Errorf("Error while walking dir %s", file)
-				}
-			} else {
-				if err := sendFile(req, file, info.Name(), info, config.Config); err != nil {
-					log.WithError(err).Errorf("Could not send file %s", file)
-				}
+		for _, path := range paths {
+			if err := send(req, FsReader(path, config.Config, true)); err != nil {
+				log.WithError(err).Errorf("Error while walking putting path %s", path)
 			}
 		}
 

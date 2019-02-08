@@ -3,7 +3,6 @@ package filestore
 import (
 	"io"
 	"os"
-	"path/filepath"
 
 	service "github.com/nlepage/codyglot/service/filestore"
 )
@@ -12,77 +11,51 @@ type fileMessageSender interface {
 	Send(*service.FileMessage) error
 }
 
-func sendFile(sender fileMessageSender, path string, relPath string, info os.FileInfo, config Config) error {
-	// FIXME wrap errors
-
-	f, err := os.Open(path)
-	if err != nil {
-		return err
-	}
-	defer f.Close()
-
-	sender.Send(&service.FileMessage{
-		FileMessage: &service.FileMessage_FileInfo{
-			FileInfo: &service.FileInfo{
-				Path:  relPath,
-				Chmod: int32(info.Mode()),
-			},
-		},
-	})
-
-	// FIXME allocate smaller cap if file is small
-	b := make([]byte, config.ChunkSize)
-
-	for {
-		i, err := f.Read(b)
-		if err == io.EOF {
-			break
-		}
-		if err != nil {
-			return err
-		}
-
-		sender.Send(&service.FileMessage{
-			FileMessage: &service.FileMessage_FileContent{
-				FileContent: &service.FileContent{
-					Content: b[:i],
-				},
-			},
-		})
-	}
-
-	return nil
+func send(sender fileMessageSender, fr Reader) error {
+	return fr.Copy(filesSender{sender})
 }
 
-func sendDir(sender fileMessageSender, dir string, config Config, includeDirName bool) error {
-	dir, err := filepath.Abs(dir)
-	if err != nil {
-		return err
+type filesSender struct {
+	ms fileMessageSender
+}
+
+var _ Writer = filesSender{}
+
+func (fs filesSender) Open(path string, chmod os.FileMode) (io.WriteCloser, error) {
+	if err := fs.ms.Send(&service.FileMessage{
+		FileMessage: &service.FileMessage_FileInfo{
+			FileInfo: &service.FileInfo{
+				Path:  path,
+				Chmod: int32(chmod),
+			},
+		},
+	}); err != nil {
+		return nil, err
 	}
 
-	dirName := filepath.Base(dir)
+	return fileSender{fs.ms}, nil
+}
 
-	return filepath.Walk(dir, func(path string, info os.FileInfo, err error) error {
-		// FIXME wrap errors
+type fileSender struct {
+	ms fileMessageSender
+}
 
-		if err != nil {
-			return err
-		}
+var _ io.WriteCloser = fileSender{}
 
-		relPath, err := filepath.Rel(dir, path)
-		if err != nil {
-			return err
-		}
-		if includeDirName {
-			relPath = filepath.Join(dirName, relPath)
-		}
+func (fs fileSender) Write(p []byte) (n int, err error) {
+	if err := fs.ms.Send(&service.FileMessage{
+		FileMessage: &service.FileMessage_FileContent{
+			FileContent: &service.FileContent{
+				Content: p,
+			},
+		},
+	}); err != nil {
+		return 0, err
+	}
 
-		if !info.IsDir() {
-			if err := sendFile(sender, path, relPath, info, config); err != nil {
-				return err
-			}
-		}
+	return len(p), nil
+}
 
-		return nil
-	})
+func (fs fileSender) Close() error {
+	return nil
 }
